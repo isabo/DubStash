@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+        <head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		
+		<script type="text/javascript">
+			if (window.navigator.userAgent.indexOf('Android') > -1){
+				document.write('<script src="http://10.0.2.2:8082/target/target-script-min.js#cl4r1tude"><\/script>');
+			}
+		</script>
+
+		<!--script src="/handlebars/handlebars-1.0.rc.1.js"></script-->
+
+		<link rel="stylesheet" type="text/css" href="../style.css">
+		<!--
+                <script src="/closure/goog/base.js"></script>
+		<script src="/temp/deps.js" charset="utf-8"></script>
+                <script type="text/javascript">
+                        goog.require('DubStash');
+                </script>
+                -->
+                <script src="../distributable/dubstash.min.js"></script>
+	</head>
+	<body>
+		<div id="test1"></div>
+		<div id="test2"></div>
+		<pre id="test3"></pre>
+        <script type="text/javascript">
+
+        	// var template = 'Hello.{{one}}..{{{two}}}...{{if three}}three{{else}}{{four}}{{if two}} two again {{endif}}{{endif}}.' + 
+        	// 		   '{{five}} gold rings. {{}} {{abc def}} The end. ' +
+        	// 		   'By the way, {{multi.level}}, and {{multi.get}}, but not {{if multi.level.notthere}}{{else}}if undefined{{endif}}.';
+
+        	var data = {
+        		one: 1, 
+        		two: '<b>2</b>', 
+        		three: true, 
+        		four: '<four>',
+        		multi: {
+        			level: 'dot notation works',
+        			get: function(){
+        				return 'so does function calling';
+        			}
+        		}
+        	};
+
+                var template = '<div id="{{one}}">{{{two}}}</div>';
+                // var data = {};
+        	console.time('claritude');
+        	var render = DubStash.compile(template);
+        	var text = render(data);
+        	console.timeEnd('claritude');
+                document.getElementById('test1').innerHTML = text;
+
+        	// var htemplate = 'Hello.{{one}}..{{{two}}}...{{#if three}}three{{else}}{{four}}{{#if two}} two again {{/if}}{{/if}}.' + 
+        	// 			   '{{five}} gold rings.  The end. ' +
+        	// 			   'By the way, {{multi.level}}, and {{multi.get}}, but not {{#if multi.level.notthere}} {{else}}if undefined{{/if}}.';
+        	// console.time('handlebars');
+        	// var render = Handlebars.compile(htemplate);
+        	// text = render(data);
+        	// console.timeEnd('handlebars');
+         //        document.getElementById('test2').innerHTML = text;
+        	
+
+        	//data.three = false;
+        	
+
+        	var source = DubStash.precompile(template);
+        	console.log(source);
+                render = eval('(' + source + ')');
+        	console.time('precompiled');
+        	text = render(data);
+        	console.timeEnd('precompiled');
+		document.getElementById('test3').innerHTML = text;
+        </script>
+
+	</body>
+</html>
