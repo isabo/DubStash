@@ -214,7 +214,7 @@
 
 						} else {
 							// Bad 'if' statement. Log it and move on.
-							log('Bad condition: ' + match[0]);
+							Console.log('Bad condition: ' + match[0]);
 						};
 						break;
 
@@ -228,7 +228,7 @@
 							// An else outside an if?!
 							// Put it back in the output to show the problem.
 							this.addTextBlock_(match[0]);
-							log('Unexpected {{else}} encountered!');
+							Console.log('Unexpected {{else}} encountered!');
 						};
 						break;
 
@@ -242,7 +242,7 @@
 							// endif without an if!?
 							// Put it back in the output to show the problem.
 							this.addTextBlock_(match[0]);
-							log('Unexpected {{endif}} encountered!');
+							Console.log('Unexpected {{endif}} encountered!');
 						};
 						break;
 
@@ -259,7 +259,7 @@
 			} else {
 
 				// Brackets are not balanced: ignore and continue.
-				log('Unbalanced brackets encountered: ' + match[0]);
+				Console.log('Unbalanced brackets encountered: ' + match[0]);
 			};
 		};
 
@@ -270,7 +270,7 @@
 		this.addTextBlock_(match);
 
 		if (this.incompleteConditions_.length){
-			log('Missing {{endif}}!');
+			Console.log('Missing {{endif}}!');
 		};
 
 		// this.topLevelBlocks_ now contains all the info needed in order to render.
@@ -759,32 +759,31 @@
 
 
 	/**
-	 * A console.log replacement that will work in a browser or on a Node server.
-	 *
-	 * @param {...*} var_args
-	 * @suppress {checkVars}
+	 * Define a console that can be used anywhere. Closure doesn't like console.log, but 
+	 * window.console is OK. However, in Node, there is no 'window', but 'console' is a global.
 	 */
-	function log(var_args){
-		try {
-			console.log.apply(console, arguments);
-		} catch (ex){};
-	};
+	var Console = /** @suppress {checkVars} Ignore the unprefixed 'console'. */(function(){
+		return this.console /* works in browsers, doesn't throw Node */ || console /* for Node*/; 
+	})();
 
 
 	// Make Runtime available externally under its proper name (Closure renames it internally)
-	// Ditto for the methods that are called from precompiled code.
-	DubStash['Runtime'] = Runtime;
-	Runtime['renderTemplate'] = Runtime.renderTemplate;
-	Runtime['renderPlaceHolderBlock'] = Runtime.renderPlaceHolderBlock;
-	Runtime['renderConditionBlock'] = Runtime.renderConditionBlock;
-
+	// Ditto for the methods that are called from precompiled code. @expose tags could have 
+	// achieved this, but the compiled (not pre-compiled) functions would have been larger, as they
+	// would not even be renamed internally.
+	if (!DubStash['Runtime']){
+		// We have been compiled by Closure - causing things to be renamed.
+		DubStash['Runtime'] = Runtime;
+		Runtime['renderTemplate'] = Runtime.renderTemplate;
+		Runtime['renderPlaceHolderBlock'] = Runtime.renderPlaceHolderBlock;
+		Runtime['renderConditionBlock'] = Runtime.renderConditionBlock;		
+	};
+	
 
 	// Break out of this closure, and show Closure Compiler that this file has a side-effect. 
-	try{
-		window['DubStash'] = DubStash;
-	} catch (ex){
-		// No window - e.g. running on a Node server.
-	};
+	// 'this' is the global object, i.e. 'window' in browsers.
+	this['DubStash'] = DubStash;
+	
 
 	// Make available in Node. Encased in function to allow the @suppress tag to be honoured.
 	/** @suppress {checkVars} */
