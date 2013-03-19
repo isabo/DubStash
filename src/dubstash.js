@@ -11,6 +11,8 @@
 	 */
 	var DubStash = {
 	
+		'VERSION': '1.0.0.rc1',
+
 		/**
 		 * Get a function that when called writes out the template while performing the necessary 
 		 * substitutions.
