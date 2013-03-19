@@ -943,9 +943,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 				// If the value is an empty array or an object with no values, return null. This
 				// allows using {{if collection}} to test whether the collection has any values.
-				// Unlike Python, in Javascript !![] or !!{} evaluate to true. In this case,
-				// the Python behaviour is more desirable, as an empty collection evaluates to
-				// false.
+				// Unlike Python, in Javascript [] and {} are both truthy. In this case, the Python
+				// behaviour is more desirable, as an empty collection is falsy.
 				if (typeof value === 'object'){
 					if (value instanceof Array){
 						return value.length ? value : null;
