@@ -1,8 +1,7 @@
 DubStash
 ========
 
-DubStash is a template engine for minimum-logic HTML templates. It is faster and leaner than 
-Handlebars, but doesn't try to do as much.
+DubStash is a fast template engine for minimum-logic HTML templates. 
 
 * Works in browsers or on a back-end Node server.
 * Compile templates at runtime; use repeatedly.
