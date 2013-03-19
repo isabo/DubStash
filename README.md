@@ -134,7 +134,7 @@ The value of `output` is:
 ### Conditions
 
 * Use `{{if propertyName}} ... {{else}} ... {{endif}}` for including text conditionally.
-* An empty array or object will evaluate to false, so you can easily test whether a collection has
+* An empty array or object will evaluate to `false`, so you can easily test whether a collection has
   items in it.
 
 ```js
@@ -145,7 +145,7 @@ var template = '<p>Dear {{if isMale}}Sir{{else}}Madam{{endif}},</p>' +
 					'{{foreach itemsOrdered}}<li>{{name}}</li>{{end foreach}}' +
 			   '</ul>' +
 			   '{{else}}' +
-			   '<p>You haven't ordered anything recently.</p>' +
+			   '<p>You have not ordered anything recently.</p>' +
 			   '{{end if}}';
 var render = DubStash.compile(template);
 
