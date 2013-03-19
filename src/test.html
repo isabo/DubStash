@@ -60,10 +60,10 @@
 
                 var template = '<div id="{{one}}">{{{two}}}{{if people}}<ul>{{foreach people}}<li>{{name}}</li>{{end foreach}}</ul>{{end if}}</div>';
                 // var data = {};
-        	console.time('claritude');
+
         	var render = DubStash.compile(template);
         	var text = render(data);
-        	console.timeEnd('claritude');
+
                 document.getElementById('test1').innerHTML = text;
 
         	// var htemplate = 'Hello.{{one}}..{{{two}}}...{{#if three}}three{{else}}{{four}}{{#if two}} two again {{/if}}{{/if}}.' + 
@@ -82,9 +82,8 @@
         	var source = DubStash.precompile(template);
         	console.log(source);
                 render = eval('(' + source + ')');
-        	console.time('precompiled');
         	text = render(data);
-        	console.timeEnd('precompiled');
+
 		document.getElementById('test3').innerHTML = text;
         </script>
 

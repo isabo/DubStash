@@ -8,6 +8,14 @@ Handlebars, but doesn't try to do as much.
 * Compile templates at runtime; use repeatedly.
 * Precompile templates to Javascript at build time for even faster loading.
 
+## tl;dr
+
+* `<script src="dubstep.min.js"></script>` [Details...](#deploying)
+* {{placeholder}}, {{{don't-escape-this-value}}} [Details...](#basic-usage)
+* \{\{**if** something}} ... {{else}} ... {{end if}} [Details...](#conditons)
+* \{\{**foreach** things}} ... {{end foreach}} [Details...](#iterations)
+* [Recursive evaluation](#recursion): {{placeholder **/r**}}
+* [Precompilation of templates to Javascript](#precompilation)
 
 ## Usage
 
@@ -198,7 +206,8 @@ var source = DubStep.precompile(template);
 
 ## Deploying
 
-Your HTML file needs to use the DubStep script. Use the distributable version [dubstep.min.js](http://).
+Your HTML file needs to use the DubStep script. Use the distributable version 
+[dubstep.min.js](http://).
 
 ```html
 <html>
