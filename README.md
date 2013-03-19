@@ -9,7 +9,7 @@ DubStash is a fast template engine for minimum-logic HTML templates.
 
 ## tl;dr
 
-* `<script src="dubstep.min.js"></script>` [Details...](#deploying)
+* `<script src="dubstash.min.js"></script>` [Details...](#deploying)
 * {{placeholder}}, {{{don't-escape-this-value}}} [Details...](#basic-usage)
 * {{<strong>if</strong> something}} ... {{else}} ... {{end if}} [Details...](#conditons)
 * {{<strong>foreach</strong> things}} ... {{end foreach}} [Details...](#iterations)
@@ -187,17 +187,17 @@ The value of `output` is:
 ## Precompilation
 
 * You can precompile templates into Javascript that can be inserted into your source files. 
-* Runtime startup will be faster because there will be no need for a `DubStep.compile()` step.
-* You still need to include a link to the DubStep script in your HTML, because precompiled functions
-  still depend on it.
+* Runtime startup will be faster because there will be no need for a `DubStash.compile()` step.
+* You still need to include a link to the DubStash script in your HTML, because precompiled 
+  functions still depend on it.
 
 ```js
 // Typically you would do this in Node, where you can save the precompiled functions without having
 // to manually copy/paste them into a .js source file.
-var DubStep = require('./dubstep.js');
+var DubStash = require('./dubstash.js');
 
 var template = 'My name is {{name}}.';
-var source = DubStep.precompile(template);
+var source = DubStash.precompile(template);
 
 // Write source into a Javascript file.
 ...
@@ -205,14 +205,14 @@ var source = DubStep.precompile(template);
 
 ## Deploying
 
-Your HTML file needs to use the DubStep script. Use the distributable version 
-[dubstep.min.js](http://).
+Your HTML file needs to use the DubStash script. Use the distributable version 
+[dubstash.min.js](https://raw.github.com/isabo/DubStash/1.0.0.rc1/distributable/dubstash.min.js).
 
 ```html
 <html>
 	<head>
 		...
-		<script src="dubstep.min.js"></script>
+		<script src="dubstash.min.js"></script>
 		...
 	</head>
 	<body>
@@ -223,9 +223,9 @@ Your HTML file needs to use the DubStep script. Use the distributable version
 
 ## Building
 
-DubStep is compiled and minified using Google Closure Compiler. The following command line does it:
+DubStash is compiled and minified using Google Closure Compiler. The following command line does it:
 
 ```
-java -jar /path/to/compiler.jar --js dubstep.js --compilation_level=ADVANCED_OPTIMIZATIONS  --warning_level=VERBOSE 
-	--jscomp_warning=checkTypes --output_wrapper="(function() {%output%})();" --js_output_file=dubstep.min.js
+java -jar /path/to/compiler.jar --js dubstash.js --compilation_level=ADVANCED_OPTIMIZATIONS  --warning_level=VERBOSE 
+	--jscomp_warning=checkTypes --output_wrapper="(function() {%output%})();" --js_output_file=dubstash.min.js
 ```
