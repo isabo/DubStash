@@ -68,8 +68,8 @@ Placeholders will be evaluated recursively when the `/r` flag is used:
 
 ```js
 var messages = {
-	appName = 'HelloWorld',
-	welcome = 'Thank you for installing "{{appName}}"'
+	appName: 'HelloWorld',
+	welcome: 'Thank you for installing "{{appName}}"'
 };
 
 var render = DubStash.compile('<p>{{welcome /r}}</p>');
@@ -91,7 +91,7 @@ var render = DubStash.compile(template);
 
 var recipient = {
 	gender: 'f',
-	isMale = function(){
+	isMale: function(){
 		return recipient.gender === 'm';
 	}
 };
