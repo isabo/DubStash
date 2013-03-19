@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="../distributable/dubstash.min.js"></script>
+		
+		<style type="text/css">
+			template {display: none;}
+		</style>
+		
+		<script type="text/javascript">
+
+			function runTest(number, data){
+
+				var template = document.getElementById('t' + number).innerHTML;
+				var render = DubStash.compile(template);	
+				document.getElementById('r' + number).innerHTML = render(data);
+			};
+
+		</script>
+	</head>
+	<body>
+
+		<template id="t1">
+			Regular placeholder: {{result}}<br>
+			Non-existent placeholder: O{{noSuchProperty}}K<br>
+			Non-escaped placeholder: <strong>{{{htmlResult}}}</strong><br>
+			Placeholder is a function: {{getResult}}<br>
+			Multi.level.placeholder: {{multi.level.result}}
+		</template>
+		<div id="r1"></div>
+		<script type="text/javascript">
+			
+			var testData = {
+				result: 'OK',
+				htmlResult: '</strong>OK<strong>',
+				multi: {
+					level: {
+						result: 'OK'
+					}
+				},
+				getResult: function(){
+					return testData.result;
+				}
+			};
+
+			runTest(1, testData);
+		</script>
+
+
+		<template id="t2">
+			Recursive placeholder - 1 level: {{result1 /r}}<br>
+			Recursive placeholder - 2 levels: {{result2 /r}}
+		</template>
+		<div id="r2"></div>
+		<script type="text/javascript">
+
+			var testData = {
+				result: 'OK',
+				result1: '{{result}}',
+				result2: '{{result3 /r}}',
+				result3: '{{result}}'
+				
+			};
+
+			runTest(2, testData);
+		</script>
+
+
+		<template id="t3">
+			Condition (true): {{if true}}{{result}}{{end if}}<br>
+			Condition (false): {{if false}}{{else}}{{result}}{{end if}}<br>
+			Condition (array with elements is truthy): {{if fullArray}}OK{{end if}}<br>
+			Condition (empty array is falsy): {{if emptyArray}}{{else}}OK{{end if}}<br>
+			Condition (object with values is truthy): {{if fullObject}}OK{{end if}}<br>
+			Condition (empty object is falsy): {{if emptyObject}}{{else}}OK{{end if}}
+		</template>
+		<div id="r3"></div>
+		<script type="text/javascript">
+
+			var testData = {
+				result: 'OK',
+				'true': true,
+				'false': false,
+				fullArray: ['a'],
+				emptyArray: [],
+				fullObject: {a: '1'},
+				emptyObject: {}
+			};
+
+			runTest(3, testData);
+		</script>
+
+
+		<template id="t4">
+			Iterate full array: {{foreach array}}{{char}}{{end foreach}}<br>
+			Iterate empty array: O{{foreach emptyArray}}{{char}}{{end foreach}}K<br>
+			Iterate full object: {{foreach object}}{{char}}{{end foreach}}<br>
+			Iterate empty object: O{{foreach emptyObject}}{{char}}{{end foreach}}K<br>
+			Iterate iterable object (forEach): {{foreach iterable}}{{char}}{{end foreach}}
+		</template>
+		<div id="r4"></div>
+		<script type="text/javascript">
+
+			var Iterable = function(){
+				this.items_ = [
+					{char: 'O'},
+					{char: 'K'}
+				];
+			};
+			Iterable.prototype.forEach = function(callback){
+
+				for (var i in this.items_){
+					callback(this.items_[i]);
+				};
+			};
+
+			var testData = {
+				array: [
+					{char: 'O'},
+					{char: 'K'}
+				],
+				emptyArray: [],
+				object: {
+					'a': {char: 'O'},
+					'b': {char: 'K'}
+				},
+				emptyObject: {},
+				iterable: new Iterable()
+			};
+
+			runTest(4, testData);
+		</script>
+
+	</body>
+</html>
