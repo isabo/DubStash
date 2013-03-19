@@ -12,8 +12,8 @@ Handlebars, but doesn't try to do as much.
 
 * `<script src="dubstep.min.js"></script>` [Details...](#deploying)
 * {{placeholder}}, {{{don't-escape-this-value}}} [Details...](#basic-usage)
-* \{\{**if** something}} ... {{else}} ... {{end if}} [Details...](#conditons)
-* \{\{**foreach** things}} ... {{end foreach}} [Details...](#iterations)
+* {{<strong>if</strong> something}} ... {{else}} ... {{end if}} [Details...](#conditons)
+* {{<strong>foreach</strong> things}} ... {{end foreach}} [Details...](#iterations)
 * [Recursive evaluation](#recursion): {{placeholder **/r**}}
 * [Precompilation of templates to Javascript](#precompilation)
 
