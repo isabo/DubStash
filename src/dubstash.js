@@ -18,10 +18,10 @@
 		 * @param {string} text The template text.
 		 * @return {function(Object, boolean=):string}
 		 * Where the params of the returned function are:
-		 * 	{Object} data An object whose fields will be substituted into the placeholders, or tested by 
-		 *		conditions.
-		 *	{boolean=} opt_ignoreUndefined Whether to leave alone placeholders whose value is undefined 
-		 *		or to replace them with nothing (default: replace with nothing).
+		 * 	{Object} data An object whose fields will be substituted into the placeholders, or  
+		 *		tested by conditions.
+		 *	{boolean=} opt_ignoreUndefined Whether to leave alone placeholders whose value is  
+		 *		undefined or to replace them with nothing (default: replace with nothing).
 		 */
 		'compile': function(text){
 
@@ -31,16 +31,17 @@
 
 
 		/**
-		 * Get the source of a function that when called writes out the template while performing the 
-		 * necessary substitutions. The source can then be saved and used instead of the template.
+		 * Get the source of a function that when called writes out the template while performing  
+		 * the necessary substitutions. The source can then be saved and used instead of the 
+		 * template.
 		 *
 		 * @param {string} text The template text.
 		 * @return {string}
 		 * Where the params of the returned function are:
-		 * 	{Object} data An object whose fields will be substituted into the placeholders, or tested by 
-		 *		conditions.
-		 *	{boolean=} opt_ignoreUndefined Whether to leave alone placeholders whose value is undefined
-		 *		or to replace them with nothing (default: replace with nothing).
+		 * 	{Object} data An object whose fields will be substituted into the placeholders, or 
+		 *		tested by conditions.
+		 *	{boolean=} opt_ignoreUndefined Whether to leave alone placeholders whose value is 
+		 *		undefined or to replace them with nothing (default: replace with nothing).
 		 */
 		'precompile': function(text){
 
@@ -76,7 +77,7 @@
 		 * @type {Array.<Object>}
 		 * @private
 		 */
-		this.incompleteConditions_ = [];
+		this.openBlocks_ = [];
 
 		/**
 		 * @type {number}
@@ -108,19 +109,19 @@
 		// Ask each block to generate a rendering function.
 		var renderers = this.getTopLevelRenderers_();
 
-		// Return a function that calls the block rendering functions and strings together the results.
-		// Partially bind the runtime function to the rendering functions generated using design time 
-		// configuration settings.
-		return function render(data, opt_ignoreUndefined){
+		// Return a function that calls the block rendering functions and strings together the 
+		// results. Partially bind the runtime function to the rendering functions generated using 
+		// design time configuration settings.
+		return /** @type {function(Object, boolean=):string}*/(function (data, opt_ignoreUndefined){
 
 			return Runtime.renderTemplate(renderers, data, opt_ignoreUndefined);
-		};
+		});
 	};
 
 
 	/**
-	 * Parses the template and returns the source code of a function that will render it. This can then
-	 * be saved into a .js file -- i.e. precompilation.
+	 * Parses the template and returns the source code of a function that will render it. This can 
+	 * then be saved into a .js file -- i.e. precompilation.
 	 *
 	 * @return {string}
 	 */
@@ -132,7 +133,8 @@
 		// Ask each block to generate the source of a rendering function.
 		var rendererSources = this.getTopLevelRendererSources_();
 
-		// Return a function that calls the block rendering functions and strings together the results.
+		// Return a function that calls the block rendering functions and strings together the
+		// results.
 		return [
 			'function(d, i){',
 			'	var r = [' + rendererSources.toString() + '];',
@@ -187,8 +189,8 @@
 			return;
 		};
 
-		// Reset our regexp just in case it was left in an unpredictable state by an incomplete parsing
-		// operation.
+		// Reset our regexp just in case it was left in an unpredictable state by an incomplete 
+		// parsing operation.
 		Compiler.PATTERN.lastIndex = 0;
 
 		// Loop through the occurrences of {{...}} 
@@ -197,8 +199,11 @@
 
 			if (match[1].length === match[4].length){
 				// The brackets are balanced.
+
+				var block, unexpected;
 				
-				// Anything between the last {{...}} (or the beginning) and this {{...}} is a text block.
+				// Anything between the last {{...}} (or the beginning) and this {{...}} is a text 
+				// block.
 				this.addTextBlock_(match);
 
 				// Now handle the {{...}} we just found.
@@ -208,9 +213,9 @@
 
 						if (match[3]){
 							// We have the beginning of a condition, e.g.: {{if x}}
-							var block = new ConditionBlock(match[3]);
+							block = new ConditionBlock(match[3]);
 							this.addBlock_(block);
-							this.incompleteConditions_.push(block);
+							this.openBlocks_.push(block);
 
 						} else {
 							// Bad 'if' statement. Log it and move on.
@@ -218,31 +223,79 @@
 						};
 						break;
 
-					
-					case 'else':
 
-						// Update the last incomplete condition that an else has been found.
-						if (this.incompleteConditions_.length){
-							this.incompleteConditions_[this.incompleteConditions_.length - 1].foundElse();
-						} else {
-							// An else outside an if?!
-							// Put it back in the output to show the problem.
-							this.addTextBlock_(match[0]);
-							Console.log('Unexpected {{else}} encountered!');
+					case 'foreach':
+
+						if (match[3]){
+							// We have a name of a collection to iterate on, e.g. {{foreach people}}
+							block = new IteratorBlock(match[3]);
+							this.addBlock_(block);
+							this.openBlocks_.push(block);
 						};
 						break;
 
+					
+					case 'else':
 
-					case 'endif':
+						// The last open block should be a condition. Tell it that an {{else}} has 
+						// been found.
+						unexpected = false;
+						if (this.openBlocks_.length){
 
-						if (this.incompleteConditions_.length){
-							// Condition is complete: remove it from the stack.
-							this.incompleteConditions_.pop();
+							var lastBlock = this.openBlocks_[this.openBlocks_.length - 1];
+							if (lastBlock instanceof ConditionBlock){
+								lastBlock.foundElse();
+							} else {
+								unexpected = true;
+							};
+
 						} else {
-							// endif without an if!?
+							unexpected = true;
+						};
+
+						if (unexpected){
+							// An else outside an if?!
 							// Put it back in the output to show the problem.
 							this.addTextBlock_(match[0]);
-							Console.log('Unexpected {{endif}} encountered!');
+							Console.log('Unexpected {{else}} encountered!');	
+						};
+				
+						break;
+
+
+					case 'end':
+
+						// End the last open block
+						unexpected = false;
+						if (this.openBlocks_.length){
+
+							// If the type of block that is supposed to be closing is specified,
+							// verify that it is closing the correct block.
+							if (match[3]){
+								
+								lastBlock = this.openBlocks_[this.openBlocks_.length - 1];
+								
+								if (match[3] === 'if'){
+									unexpected = !(lastBlock instanceof ConditionBlock);
+								} else if (match[3] === 'foreach'){
+									unexpected = !(lastBlock instanceof IteratorBlock);
+								} else {
+									unexpected = true;
+								};
+							};
+							
+						} else {
+							unexpected = true;
+						};
+
+						if (!unexpected){
+							// Condition is complete: remove it from the stack.
+							this.openBlocks_.pop();
+						} else {
+							// Found the end of a block when none are open? Wrong type of end?
+							// Put it back in the output to show the problem.
+							this.addTextBlock_(match[0]);
+							Console.log('Unexpected {{end}} encountered!');
 						};
 						break;
 
@@ -251,8 +304,7 @@
 						// A regular placeholder.
 						var htmlEscape = (match[1].length === 2);
 						var isRecursive = (match[3] === '/r');
-						block = new PlaceholderBlock(match[2], isRecursive, 
-						                                                        htmlEscape);
+						block = new PlaceholderBlock(match[2], isRecursive, htmlEscape);
 						this.addBlock_(block);					
 				};
 
@@ -269,8 +321,8 @@
 		match.index = this.text_.length;
 		this.addTextBlock_(match);
 
-		if (this.incompleteConditions_.length){
-			Console.log('Missing {{endif}}!');
+		if (this.openBlocks_.length){
+			Console.log('Missing {{end}}!');
 		};
 
 		// this.topLevelBlocks_ now contains all the info needed in order to render.
@@ -286,7 +338,9 @@
 	 */
 	Compiler.prototype.addTextBlock_ = function(match){
 
-		var str = (typeof match === 'string') ? match : this.text_.slice(this.lastIndex_, match.index);
+		var str = (typeof match === 'string') ? 
+			match : this.text_.slice(this.lastIndex_, match.index);
+
 		if (str.length){
 			var block = new TextBlock(str);
 			this.addBlock_(block);
@@ -304,9 +358,9 @@
 	 */
 	Compiler.prototype.addBlock_ = function(block){
 
-		if (this.incompleteConditions_.length){
-			// It is subordinate to a condition.
-			this.incompleteConditions_[this.incompleteConditions_.length - 1].addBlock(block);
+		if (this.openBlocks_.length){
+			// It is subordinate to a condition or iterator.
+			this.openBlocks_[this.openBlocks_.length - 1].addBlock(block);
 		} else {
 			// It is at the top level.
 			this.topLevelBlocks_.push(block);
@@ -344,8 +398,8 @@
 
 
 	/**
-	 * Returns a function that when called will generate the run-time text of the block according to a
-	 * supplied data object and options.
+	 * Returns a function that when called will generate the run-time text of the block according to
+	 * a supplied data object and options.
 	 *
 	 * @return {function(Object, boolean):string}
 	 */
@@ -359,15 +413,15 @@
 
 
 	/**
-	 * Returns the source code for a function that when called will generate the run-time text of the 
-	 * block according to a supplied data object and options.
+	 * Returns the source code for a function that when called will generate the run-time text of  
+	 * the block according to a supplied data object and options.
 	 *
 	 * @return {string} 
 	 */
 	TextBlock.prototype.getRendererSource = function(){
 
-		// Return a function with the value of this.text_ frozen into it, because serialized functions
-		// lose their scope variables.
+		// Return a function with the value of this.text_ frozen into it, because serialized 
+		// functions lose their scope variables.
 		return [
 			'function(){',
 			'	return "' + this.jsEscape(this.text_) + '";',
@@ -395,8 +449,8 @@
 
 
 	/**
-	 * Used by precompiler. Makes text safe for inclusion in precompiled JavaScript. That means escaping
-	 * any double quotes.
+	 * Used by precompiler. Makes text safe for inclusion in precompiled JavaScript. That means 
+	 * escaping any double quotes.
 	 *
 	 * @param {string} text
 	 * @return {string}
@@ -416,9 +470,10 @@
 	 * Represents a placeholder to be replaced with data at runtime. Discovered by the compiler.
 	 *
 	 * @param {string} name The name of the field to look up at runtime.
-	 * @param {boolean} isRecursive Whether to treat the resulting value as a template and process that.
-	 * @param {boolean} htmlEscape Whether to escape the runtime value to make it safe for inclusion in 
-	 * 		HTML.
+	 * @param {boolean} isRecursive Whether to treat the resulting value as a template and process 
+	 *		that.
+	 * @param {boolean} htmlEscape Whether to escape the runtime value to make it safe for inclusion
+	 * 		in HTML.
 	 * @constructor
 	 */
 	var PlaceholderBlock = function(name, isRecursive, htmlEscape){
@@ -444,8 +499,8 @@
 
 
 	/**
-	 * Returns a function that when called will generate the run-time text of the block according to a
-	 * supplied data object and options.
+	 * Returns a function that when called will generate the run-time text of the block according to
+	 * a supplied data object and options.
 	 *
 	 * @return {function(Object, boolean):string}
 	 */
@@ -462,17 +517,17 @@
 
 
 	/**
-	 * Returns the source code for a function that when called will generate the run-time text of the 
-	 * block according to a supplied data object and options.
+	 * Returns the source code for a function that when called will generate the run-time text of 
+	 * the block according to a supplied data object and options.
 	 *
 	 * @return {string} 
 	 */
 	PlaceholderBlock.prototype.getRendererSource = function(){
 
 		// We would like to partially bind the runtime block renderer function with design-time
-		// params, but because we will serialize the function to text, it will lose its scope variables
-		// - i.e. the binding will be worthless. We therefore have to freeze the values of the design-
-		// time variables into the function.
+		// params, but because we will serialize the function to text, it will lose its scope 
+		// variables - i.e. the binding will be worthless. We therefore have to freeze the values of
+		// the design-time variables into the function.
 		return [
 			'function(d, i){',
 			'	return DubStash.Runtime.renderPlaceHolderBlock(' +
@@ -521,8 +576,8 @@
 
 
 	/**
-	 * Tell the block that its {{else}} has been encountered. Any subordinate blocks encountered will be
-	 * 'false' blocks -- blocks to use if the condition evaluates to false.
+	 * Tell the block that its {{else}} has been encountered. Any subordinate blocks encountered 
+	 * will be 'false' blocks -- blocks to use if the condition evaluates to false.
 	 */
 	ConditionBlock.prototype.foundElse = function(){
 
@@ -543,8 +598,8 @@
 
 
 	/**
-	 * Returns a function that when called will generate the run-time text of the block according to a
-	 * supplied data object and options.
+	 * Returns a function that when called will generate the run-time text of the block according to
+	 * a supplied data object and options.
 	 *
 	 * @return {function(Object, boolean):string}
 	 */
@@ -564,8 +619,8 @@
 
 
 	/**
-	 * Returns the source code for a function that when called will generate the run-time text of the 
-	 * block according to a supplied data object and options.
+	 * Returns the source code for a function that when called will generate the run-time text of 
+	 * the block according to a supplied data object and options.
 	 *
 	 * @return {string} 
 	 */
@@ -586,7 +641,8 @@
 	 * Get an array of rendering functions for trueBlocks or falseBlocks.
 	 * 
 	 * @param {!Array.<Object>} blocks Either trueBlocks or falseBlocks.
-	 * @return {!Array.<function(Object, boolean):string>} Array of rendering functions to call at runtime.
+	 * @return {!Array.<function(Object, boolean):string>} Array of rendering functions to call at 
+	 *		runtime.
 	 * @private
 	 */
 	ConditionBlock.prototype.getSubRenderers_ = function(blocks){
@@ -621,12 +677,119 @@
 
 
 	/**
-	 * A collection of methods for rendering compiled blocks once we have the data available to plug in,
-	 * i.e. at "runtime". This is all that is needed by precompiled rendering functions.
+	 * Represents an iterator block to be evaluated at runtime.
+	 *
+	 * @param {string} name The name of the collection field to iterate on at runtime.
+	 * @constructor
+	 */
+	var IteratorBlock = function(name){
+
+		/**
+		 * @type {string}
+		 * @private
+		 */
+		this.name_ = name;
+
+		/**
+		 * @type {!Array.<Object>}
+		 * @private
+		 */
+		this.blocks_ = [];
+	};
+
+
+	/**
+	 * Returns a function that when called will generate the run-time text of the block according to
+	 * a supplied data object and options.
+	 *
+	 * @return {function(Object, boolean):string}
+	 */
+	IteratorBlock.prototype.getRenderer = function(){
+
+		// Bind the design-time configuration settings to the runtime rendering function.
+		var self = this;
+		return function(data, ignoreUndefined){
+
+			return Runtime.renderIteratorBlock(self.name_, self.getSubRenderers_(),	data, 
+				ignoreUndefined);
+		};
+	};
+
+
+	/**
+	 * Returns the source code for a function that when called will generate the run-time text of  
+	 * the block according to a supplied data object and options.
+	 *
+	 * @return {string} 
+	 */
+	IteratorBlock.prototype.getRendererSource = function(){
+
+		return [
+			'function(d, i){',
+			'	var n = "' + this.name_ + '";',
+			'	var s = [' + this.getSubRendererSources_().toString() + '];',
+			'	return DubStash.Runtime.renderIteratorBlock(n, s, d, i);',
+			'}'
+		].join('\n');
+	};
+
+	
+	/** 
+	 * Adds a subordinate block during parsing.
+	 *
+	 * @param {Object} block
+	 */
+	IteratorBlock.prototype.addBlock = function(block){
+
+		this.blocks_.push(block);
+	};
+
+
+	/**
+	 * Get an array of rendering functions for trueBlocks or falseBlocks.
+	 * 
+	 * @return {!Array.<function(Object, boolean):string>} Array of rendering functions to call at
+	 *		runtime.
+	 * @private
+	 */
+	IteratorBlock.prototype.getSubRenderers_ = function(){
+
+		var renderers = [];
+		for (var i in this.blocks_){
+			renderers.push(this.blocks_[i].getRenderer());
+		};
+
+		return renderers;
+	};
+
+
+	/**
+	 * Get an array of the sources of rendering functions for the iterable blocks.
+	 * 
+	 * @return {!Array.<string>} Array of sources of rendering functions to call at runtime.
+	 * @private
+	 */
+	IteratorBlock.prototype.getSubRendererSources_ = function(){
+
+		var rendererSources = [];
+		for (var i in this.blocks_){
+			rendererSources.push(this.blocks_[i].getRendererSource());
+		};
+
+		return rendererSources;
+	};
+
+
+
+
+	/**
+	 * A collection of methods for rendering compiled blocks once we have the data available to plug
+	 * in, i.e. at "runtime". This is all that is needed by precompiled rendering functions.
 	 */
 	var Runtime = {
 
 		/** 
+		 * @param {Array.<function(Object, boolean=):string>} renderers
 		 * @param {Object} data
 		 * @param {boolean=} opt_ignoreUndefined
 		 * @return {string}
@@ -641,6 +804,14 @@
 		},
 
 
+		/**
+		 * @param {string} name
+		 * @param {boolean} isRecursive
+		 * @param {boolean} htmlEscape 
+		 * @param {Object} data
+		 * @param {boolean=} ignoreUndefined
+		 * @return {string}
+		 */
 		renderPlaceHolderBlock: function(name, isRecursive, htmlEscape, data, ignoreUndefined){
 
 			var value = Runtime.getValue_(name, data);
@@ -667,16 +838,52 @@
 		},
 
 
+		/**
+		 * @param {string} name
+		 * @param {Array.<function(Object, boolean=):string>} trueRenderers
+		 * @param {Array.<function(Object, boolean=):string>} falseRenderers
+		 * @param {Object} data
+		 * @param {boolean=} ignoreUndefined
+		 * @return {string}
+		 */
 		renderConditionBlock: function(name, trueRenderers, falseRenderers, data, ignoreUndefined){
 
 			// Decide which set of renderers to use.
 			var value = Runtime.getValue_(name, data);
 			var renderers = value ? trueRenderers : falseRenderers;
 
-			// Call the appropriate set of rendering functions in turn, and string the results together.
+			// Call the appropriate set of rendering functions in turn, and string the results 
+			// together.
 			var output = [];
 			for (var i in renderers){
 				output.push(renderers[i].call(null, data, ignoreUndefined));
+			};
+
+			return output.join('');
+		},
+
+
+		/**
+		 * @param {string} name
+		 * @param {Array.<function(Object, boolean=):string>} subRenderers
+		 * @param {Object} data
+		 * @param {boolean=} ignoreUndefined
+		 * @return {string}
+		 */
+		renderIteratorBlock: function(name, subRenderers, data, ignoreUndefined){
+
+			// Get the value, which should be an iterable collection.
+			var collection = Runtime.getValue_(name, data);
+
+			var output = [];
+
+			// Iterate through the collection, writing out our sub-blocks for each item.
+			if (collection){
+				this.forEach_(collection, function(member){
+					for (var i in subRenderers){
+						output.push(subRenderers[i].call(null, member, ignoreUndefined));
+					};
+				});
 			};
 
 			return output.join('');
@@ -703,12 +910,61 @@
 					return undefined;					
 				};				
 			} else {
+
+				var value;
 				if (typeof obj[name] === 'function'){
 					// Call it.
-					return obj[name](); 
+					value = obj[name](); 
 				} else {
-					return obj[name];	
+					value = obj[name];	
 				};
+
+				// If the value is an empty array or an object with no values, return null. This
+				// allows using {{if collection}} to test whether the collection has any values.
+				// Unlike Python, in Javascript !![] or !!{} evaluate to true. In this case,
+				// the Python behaviour is more desirable, as an empty collection evaluates to
+				// false.
+				if (typeof value === 'object'){
+					if (value instanceof Array){
+						return value.length ? value : null;
+					} else {
+						for(var p in value){
+							// There is at least one key: bail out now.
+							return value;
+						};
+						// No keys.
+						return null;
+					};
+				} else {
+					
+					return value;
+				};
+			};
+		},
+
+
+		/**
+		 * Cycle through each member of a collection, calling the callback with each member.
+		 *
+		 * @param {Object} collection An object that is supposed to be iterable.
+		 * @param {function(*)} callback Called with each member as a parameter.
+		 * @private
+		 */
+		forEach_: function(collection, callback){
+
+			if (typeof collection.forEach === 'function'){
+				// The collection already has this functionality, so use it.
+				collection.forEach(callback);
+
+			} else if (typeof collection === 'object'){
+				// Either we're on a platform where Array does not yet have forEach, or this is
+				// an object, so iterate through its values.
+				for (var i in collection){
+					callback.call(this, collection[i]);
+				};
+			} else {
+				// It's probably not a collection. Just return itself as the first and only member.
+				callback.call(this, collection);
 			};
 		},
 
@@ -777,6 +1033,7 @@
 		Runtime['renderTemplate'] = Runtime.renderTemplate;
 		Runtime['renderPlaceHolderBlock'] = Runtime.renderPlaceHolderBlock;
 		Runtime['renderConditionBlock'] = Runtime.renderConditionBlock;		
+		Runtime['renderIteratorBlock'] = Runtime.renderIteratorBlock;
 	};
 	
 

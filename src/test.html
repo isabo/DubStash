@@ -41,10 +41,24 @@
         			get: function(){
         				return 'so does function calling';
         			}
-        		}
+        		},
+                people: [
+                    {
+                        name: 'John'
+                    },
+                    {
+                        name: 'Mary'
+                    },
+                    {
+                        name: 'Jack'
+                    },
+                    {
+                        name: 'Jill'
+                    }
+                ]
         	};
 
-                var template = '<div id="{{one}}">{{{two}}}</div>';
+                var template = '<div id="{{one}}">{{{two}}}{{if people}}<ul>{{foreach people}}<li>{{name}}</li>{{end foreach}}</ul>{{end if}}</div>';
                 // var data = {};
         	console.time('claritude');
         	var render = DubStash.compile(template);
