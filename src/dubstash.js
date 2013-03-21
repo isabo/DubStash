@@ -967,7 +967,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		/**
 		 * Cycle through each member of a collection, calling the callback with each member.
 		 *
-		 * @param {Object} collection An object that is supposed to be iterable.
+		 * @param {Collection} collection An object that is supposed to be iterable.
 		 * @param {function(*)} callback Called with each member as a parameter.
 		 * @private
 		 */
@@ -976,6 +976,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			if (typeof collection.forEach === 'function'){
 				// The collection already has this functionality, so use it.
 				collection.forEach(callback);
+
+			} else if (typeof collection.__iterator__ === 'function'){
+				
+				// It has a Javascript 1.7 style iterator function. We might not actually be on 1.7,
+				// so we cannot just say 'for value in collection'. We'll use the iterator 
+				// explicitly.
+				var iterator = collection.__iterator__(false);
+				var stopped = false;
+				while (!stopped){
+					try {
+						var obj = iterator.next();
+					} catch (ex){
+						// Assume this is StopIterator. Since Node doesnt support this yet, it 
+						// is difficult to write a script that would get us the global StopIterator
+						// error to compare with.
+						stopped = true;
+					};
+					if (!stopped){
+						callback.call(this, obj);
+					};
+				};
 
 			} else if (typeof collection === 'object'){
 				// Either we're on a platform where Array does not yet have forEach, or this is
