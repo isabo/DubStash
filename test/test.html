@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<script src="../distributable/dubstash.min.js"></script>		
+		<!--script src="../src/dubstash.js"></script-->
 	</head>
 	<body>
 
@@ -82,6 +83,17 @@
 					iterable: new Iterable()
 				};
 
+				// Backtracking test data
+				var testData5 = {
+					items: [
+						{name: 'one'}
+					],
+					result: 'OK',
+					x: {
+						result: 'y'
+					}
+				};
+
 				var tests = [
 					['Regular placeholder', '{{result}}', testData1, 'OK'],
 					['Non-existent placeholder', 'O{{noSuchProperty}}K', testData1, 'OK'],
@@ -100,17 +112,45 @@
 					['Iterate empty array', 'O{{foreach emptyArray}}{{char}}{{end foreach}}K', testData4, 'OK'],
 					['Iterate full object', '{{foreach object}}{{char}}{{end foreach}}', testData4, 'OK'],
 					['Iterate empty object', 'O{{foreach emptyObject}}{{char}}{{end foreach}}K', testData4, 'OK'],
-					['Iterate iterable object (forEach)', '{{foreach iterable}}{{char}}{{end foreach}}', testData4, 'OK']			
+					['Iterate iterable object (forEach)', '{{foreach iterable}}{{char}}{{end foreach}}', testData4, 'OK'],
+					['Climb {{../property}}', '{{foreach items}}{{../../result}}{{end foreach}}', testData5, 'OK'],
+					['Climb &amp; dive {{../object.property}}', '{{foreach items}}{{name}}{{../../x.result}}{{end foreach}}', testData5, 'oney']
 				];
 
 				function runTest(description, template, testData, expectedResult){
 
-					var render1 = DubStash.compile(template);
-					var result1 = (render1(testData) === expectedResult) ? 'OK' : 'FAILED';
+					var result1 = 'FAILED';
+					try{
+						var render1 = DubStash.compile(template);
+						var output1 = render1(testData);
+						if (output1 === expectedResult){
+							result1 = 'OK';
+						} else {
+							result1 += ' (result: \'' + output1 + '\')'; 
+						};
+					} catch (ex){
+						result1 += ': ' + ex.message;
+						if ('stack' in ex){
+							console.error(ex.stack);
+						};
+					};
 
-					var precompiled = DubStash.precompile(template);
-					var render2 = eval('(' + precompiled + ')');
-					var result2 = (render2(testData) === expectedResult) ? 'OK' : 'FAILED';
+					var result2 = 'FAILED';
+					try {
+						var precompiled = DubStash.precompile(template);
+						var render2 = eval('(' + precompiled + ')');
+						var output2 = render2(testData);
+						if (output2 === expectedResult){
+							result2 = 'OK';
+						} else {
+							result2 += ' (result: \'' + output2 + '\')'; 
+						};
+					} catch (ex){
+						result2 += ': ' + ex.message;	
+						if ('stack' in ex){
+							console.error(ex.stack);
+						};
+					};
 
 					document.write('<tr><td>' + description + '</td><td>' + result1 + '</td><td>' + 
 						result2 + '</td>');

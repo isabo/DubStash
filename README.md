@@ -106,12 +106,14 @@ The value of `output` is:
   one.
 * Inside the loop, the data object is the current member of the collection being iterated. In the 
   example below `{{name}}` is used twice, but the second instance refers to a different person.
+** Inside a loop, you can still access the parent object by prefixing the property name with `../`
+   or `../../` etc. 
 * Not only arrays can be iterated. Objects can be iterated, as well as anything that has a `forEach` 
   method. 
 
 ```js
 var template = '<p>These are the people that {{name}} invited:</p>' +
-			   '<ul>{{foreach invitees}}<li>{{name}}</li>{{end foreach}}</ul>';
+			   '<ul>{{foreach invitees}}<li>{{name}} (invited by {{../../name}})</li>{{end foreach}}</ul>';
 var render = DubStash.compile(template);
 
 var person = {
@@ -130,9 +132,9 @@ The value of `output` is:
 ```html
 <p>These are the people that John Smith invited:</p>
 <ul>
-	<li>Fred Bloggs</li>
-	<li>Jack Jackson</li>
-	<li>Mary Black</li>
+	<li>Fred Bloggs (invited by John Smith)</li>
+	<li>Jack Jackson (invited by John Smith)</li>
+	<li>Mary Black (invited by John Smith)</li>
 </ul>
 
 <!-- Linebreaks and indents added for clarity -->

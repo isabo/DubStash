@@ -401,8 +401,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	Compiler.PATTERN = /({{2,3})\s*([^}\s]+)\s*([^}]*)?(}{2,3})/g;
 
 
-
-
 	/**
 	 * Represents a block of static text discovered by the compiler.
 	 *
@@ -423,7 +421,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Returns a function that when called will generate the run-time text of the block according to
 	 * a supplied data object and options.
 	 *
-	 * @return {function(Object, boolean):string}
+	 * @return {Renderer}
 	 */
 	TextBlock.prototype.getRenderer = function(){
 
@@ -524,17 +522,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Returns a function that when called will generate the run-time text of the block according to
 	 * a supplied data object and options.
 	 *
-	 * @return {function(Object, boolean):string}
+	 * @return {Renderer}
 	 */
 	PlaceholderBlock.prototype.getRenderer = function(){
 
 		// Bind the design-time configuration settings to the runtime rendering function.
 		var self = this;
-		return function(data, ignoreUndefined){
+		return /** @type {Renderer} */(function(context, ignoreUndefined){
 
-			return Runtime.renderPlaceHolderBlock(self.name_, self.isRecursive_, 
-				self.htmlEscape_, data, ignoreUndefined);
-		};
+			return Runtime.renderPlaceHolderBlock(self.name_, self.isRecursive_, self.htmlEscape_, 
+				context, ignoreUndefined);
+		});
 	};
 
 
@@ -551,10 +549,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		// variables - i.e. the binding will be worthless. We therefore have to freeze the values of
 		// the design-time variables into the function.
 		return [
-			'function(d, i){',
+			'function(c, i){',
 			'	return DubStash.Runtime.renderPlaceHolderBlock(' +
 					['"' + this.name_ + '"', this.isRecursive_, this.htmlEscape_].join(', ') + 
-					', d, i);',
+					', c, i);',
 
 			'}'
 		].join('\n');
@@ -623,7 +621,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Returns a function that when called will generate the run-time text of the block according to
 	 * a supplied data object and options.
 	 *
-	 * @return {function(Object, boolean):string}
+	 * @return {Renderer}
 	 */
 	ConditionBlock.prototype.getRenderer = function(){
 
@@ -632,11 +630,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var trueRenderers = this.getSubRenderers_(this.trueBlocks_);
 		var falseRenderers = this.getSubRenderers_(this.falseBlocks_);
 
-		return function(data, ignoreUndefined){
+		return /** @type {Renderer} */(function(context, ignoreUndefined){
 
-			return Runtime.renderConditionBlock(name, trueRenderers, falseRenderers, data, 
+			return Runtime.renderConditionBlock(name, trueRenderers, falseRenderers, context, 
 				ignoreUndefined);
-		};
+		});
 	};
 
 
@@ -649,11 +647,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	ConditionBlock.prototype.getRendererSource = function(){
 
 		return [
-			'function(d, i){',
+			'function(c, i){',
 			'	var n = "' + this.name_ + '";',
 			'	var t = [' + this.getSubRendererSources_(this.trueBlocks_).toString() + '];',
 			'	var f = [' + this.getSubRendererSources_(this.falseBlocks_).toString() + '];',
-			'	return DubStash.Runtime.renderConditionBlock(n, t, f, d, i);',
+			'	return DubStash.Runtime.renderConditionBlock(n, t, f, c, i);',
 			'}'
 		].join('\n');
 	};
@@ -663,7 +661,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Get an array of rendering functions for trueBlocks or falseBlocks.
 	 * 
 	 * @param {!Array.<Object>} blocks Either trueBlocks or falseBlocks.
-	 * @return {!Array.<function(Object, boolean):string>} Array of rendering functions to call at 
+	 * @return {!Array.<Renderer>} Array of rendering functions to call at 
 	 *		runtime.
 	 * @private
 	 */
@@ -724,17 +722,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Returns a function that when called will generate the run-time text of the block according to
 	 * a supplied data object and options.
 	 *
-	 * @return {function(Object, boolean):string}
+	 * @return {Renderer}
 	 */
 	IteratorBlock.prototype.getRenderer = function(){
 
 		// Bind the design-time configuration settings to the runtime rendering function.
 		var self = this;
-		return function(data, ignoreUndefined){
+		return /** @type {Renderer} */(function(context, ignoreUndefined){
 
-			return Runtime.renderIteratorBlock(self.name_, self.getSubRenderers_(),	data, 
+			return Runtime.renderIteratorBlock(self.name_, self.getSubRenderers_(),	context,
 				ignoreUndefined);
-		};
+		});
 	};
 
 
@@ -747,10 +745,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	IteratorBlock.prototype.getRendererSource = function(){
 
 		return [
-			'function(d, i){',
+			'function(c, i){',
 			'	var n = "' + this.name_ + '";',
 			'	var s = [' + this.getSubRendererSources_().toString() + '];',
-			'	return DubStash.Runtime.renderIteratorBlock(n, s, d, i);',
+			'	return DubStash.Runtime.renderIteratorBlock(n, s, c, i);',
 			'}'
 		].join('\n');
 	};
@@ -770,7 +768,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	/**
 	 * Get an array of rendering functions for trueBlocks or falseBlocks.
 	 * 
-	 * @return {!Array.<function(Object, boolean):string>} Array of rendering functions to call at
+	 * @return {!Array.<Renderer>} Array of rendering functions to call at
 	 *		runtime.
 	 * @private
 	 */
@@ -811,16 +809,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	var Runtime = {
 
 		/** 
-		 * @param {Array.<function(Object, boolean=):string>} renderers
+		 * @param {Array.<Renderer>} renderers
 		 * @param {Object} data
 		 * @param {boolean=} opt_ignoreUndefined
 		 * @return {string}
 		 */
 		renderTemplate: function(renderers, data, opt_ignoreUndefined){
 
+			// Create a context for the renderers to use.
+			var context = this.createContext_(data, '', data);
+
 			var output = [];
 			for (var i in renderers){
-				output.push(renderers[i].call(null, data, opt_ignoreUndefined));
+				output.push(renderers[i].call(null, context, opt_ignoreUndefined));
 			};
 			return output.join('');
 		},
@@ -830,13 +831,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		 * @param {string} name
 		 * @param {boolean} isRecursive
 		 * @param {boolean} htmlEscape 
-		 * @param {Object} data
+		 * @param {Context} context 
 		 * @param {boolean=} ignoreUndefined
 		 * @return {string}
 		 */
-		renderPlaceHolderBlock: function(name, isRecursive, htmlEscape, data, ignoreUndefined){
+		renderPlaceHolderBlock: function(name, isRecursive, htmlEscape, context, ignoreUndefined){
 
-			var value = Runtime.getValue_(name, data);
+			var value = Runtime.getValue_(name, context);
 
 			if (ignoreUndefined && value === undefined){
 				
@@ -852,7 +853,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					if (isRecursive && text.indexOf('{{') !== -1) {
 						// Need to compile text as a mini-template and render it.
 						var render = DubStash.compile(text);
-						text = render.call(null, data, ignoreUndefined);
+						text = render.call(null, context.currentObj, ignoreUndefined);
 					};
 					return text;
 				};
@@ -862,23 +863,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		/**
 		 * @param {string} name
-		 * @param {Array.<function(Object, boolean=):string>} trueRenderers
-		 * @param {Array.<function(Object, boolean=):string>} falseRenderers
-		 * @param {Object} data
+		 * @param {Array.<Renderer>} trueRenderers
+		 * @param {Array.<Renderer>} falseRenderers
+ 		 * @param {Context} context 
 		 * @param {boolean=} ignoreUndefined
 		 * @return {string}
 		 */
-		renderConditionBlock: function(name, trueRenderers, falseRenderers, data, ignoreUndefined){
+		renderConditionBlock: function(name, trueRenderers, falseRenderers, context, ignoreUndefined){
 
 			// Decide which set of renderers to use.
-			var value = Runtime.getValue_(name, data);
+			var value = Runtime.getValue_(name, context);
 			var renderers = value ? trueRenderers : falseRenderers;
 
 			// Call the appropriate set of rendering functions in turn, and string the results 
 			// together.
 			var output = [];
 			for (var i in renderers){
-				output.push(renderers[i].call(null, data, ignoreUndefined));
+				output.push(renderers[i].call(null, context, ignoreUndefined));
 			};
 
 			return output.join('');
@@ -887,23 +888,35 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		/**
 		 * @param {string} name
-		 * @param {Array.<function(Object, boolean=):string>} subRenderers
-		 * @param {Object} data
+		 * @param {Array.<Renderer>} subRenderers
+		 * @param {Context} context
 		 * @param {boolean=} ignoreUndefined
 		 * @return {string}
 		 */
-		renderIteratorBlock: function(name, subRenderers, data, ignoreUndefined){
+		renderIteratorBlock: function(name, subRenderers, context, ignoreUndefined){
 
 			// Get the value, which should be an iterable collection.
-			var collection = Runtime.getValue_(name, data);
+			var collection = Runtime.getValue_(name, context);
 
 			var output = [];
 
 			// Iterate through the collection, writing out our sub-blocks for each item.
 			if (collection){
+
+				// The individual items we will now render need their own context. 
+				// Build the path of the member. 'name' refers to the collection. Use a made-up
+				// name to refer to the item retrieved from the collection.
+				var memberPath = context.currentPath.length ? 
+					context.currentPath + '.' + name : name;
+				memberPath += '.[item]';
+
+				// Create a general context, which will be customised for each item.
+				var itemContext = this.createContext_(null, memberPath, context.rootObj);
+
 				this.forEach_(collection, function(member){
 					for (var i in subRenderers){
-						output.push(subRenderers[i].call(null, member, ignoreUndefined));
+						itemContext.currentObj = member;
+						output.push(subRenderers[i].call(null, itemContext, ignoreUndefined));
 					};
 				});
 			};
@@ -913,53 +926,160 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 		/**
+		 * Create a context object to pass to a renderer.
+		 *
+		 * @param {Object} currentObj The current data object. 
+		 * @param {string} currentPath The full name of the current object in multi.level.notation.
+		 * @param {Object} rootObj The original data object provided to the renderTemplate method.
+		 * @return {Context}
+		 * @private
+		 */ 
+		createContext_: function(currentObj, currentPath, rootObj){
+
+			return {
+				currentObj: currentObj,
+				currentPath: currentPath,
+				rootObj: rootObj
+			};
+		},
+
+
+		/**
 		 * At runtime, return the value of a multi.level.property of an object.
 		 *
-		 * @param {string} name A property name to evaluate on obj. May contain dots.
-		 * @param {Object} obj An object to use to evaluate the name.
+		 * @param {string} name A property name to evaluate on obj. May contain dots, or a climbing
+		 *		prefix, e.g. ../
+		 * @param {Context} context A context object.
 		 * @return {*}
 		 * @private
 		 */
-		getValue_: function(name, obj){
+		getValue_: function(name, context){
 
-			// Take the first segment of a multi.segment.name and test obj with it.
-			var i = name.indexOf('.');
-			if (i > 0 && i < name.length - 1){
-				var topName = name.slice(0, i);
-				if (topName in obj){
-					return Runtime.getValue_(name.slice(i + 1), obj[topName]);
+			// If name starts with ../ we need to change context to an ancestor.
+			context = this.getAncestorContext_(name, context); // Just do the climbing
+
+			// Now that we have the ancestor context, we can strip the leading ../
+			// getAncestorContext_ actually did it for us.
+			if (context.name){
+				name = context.name;
+			};
+
+			// Drill down to the end of the multi.segment.name, changing the context as we go.
+			// Cycle through all except the last segment.
+			var segments = name.split('.');
+			var lastSegmentIndex = segments.length - 1; 
+			for (var i = 0; i < lastSegmentIndex; i++){
+				var nextObj = this.evaluate_(context.currentObj, segments[i]);
+				if (nextObj !== undefined){
+					var nextPath = [context.currentPath, segments[i]].join('.');
+					context.currentObj = nextObj;
+					context.currentPath = nextPath;
 				} else {
-					return undefined;					
-				};				
+					// We cannot drill any further - won't be able to evaluate.
+					return undefined;
+				};
+			};
+
+			// Our context now points to an object which we hope has a property accessible using 
+			// the last segment.
+			return this.evaluate_(context.currentObj, segments[lastSegmentIndex]); 
+		},
+
+
+		/** 
+		 * Evaluates an object property. Empty arrays and objects are falsy.
+		 *
+		 * @param {Object} obj The object that contains the property we want.
+		 * @param {string} property The name of the property we want to evaluate.
+		 * @return {*}
+		 * @private
+		 */
+		evaluate_: function(obj, property){
+
+			var value;
+			
+			if (typeof obj[property] === 'function'){
+				// Call it.
+				value = obj[property](); 
 			} else {
+				value = obj[property];	
+			};
 
-				var value;
-				if (typeof obj[name] === 'function'){
-					// Call it.
-					value = obj[name](); 
+			// If the value is an empty array or an object with no values, return null. This
+			// allows using {{if collection}} to test whether the collection has any values.
+			// Unlike Python, in Javascript [] and {} are both truthy. In this case, the Python
+			// behaviour is more desirable, as an empty collection is falsy.
+			if (typeof value === 'object'){
+				if (value instanceof Array){
+					return value.length ? value : null;
 				} else {
-					value = obj[name];	
-				};
-
-				// If the value is an empty array or an object with no values, return null. This
-				// allows using {{if collection}} to test whether the collection has any values.
-				// Unlike Python, in Javascript [] and {} are both truthy. In this case, the Python
-				// behaviour is more desirable, as an empty collection is falsy.
-				if (typeof value === 'object'){
-					if (value instanceof Array){
-						return value.length ? value : null;
-					} else {
-						for(var p in value){
-							// There is at least one key: bail out now.
-							return value;
-						};
-						// No keys.
-						return null;
+					for(var p in value){
+						// There is at least one key: bail out now.
+						return value;
 					};
-				} else {
-					
-					return value;
+					// No keys.
+					return null;
 				};
+			} else {
+				
+				return value;
+			};
+		},
+
+
+		/**
+		 * If the desired property name begins with '../', climb the levels of ../ and return 
+		 * the corresponding context.
+		 *
+		 * @param {string} name
+		 * @param {Context} context
+		 */ 
+		getAncestorContext_: function(name, context){
+
+			// Find how many levels to climb.
+			var levels = name.split('../').length - 1; // Assumes all ../ at the beginning.
+
+			if (levels){
+
+				// name refers to an object one or more level(s) above the supplied context.
+
+				// Chop the last X segments off currentPath to get the path of the object that 
+				// 'name' is relative to, which is the ancestor we want. Note that the root object
+				// has a path of '', so the currentPath does not show it.
+				var currentPathSegments = (context.currentPath).split('.');
+				var lastDesiredSegmentIndex = currentPathSegments.length - levels - 1;
+				if (lastDesiredSegmentIndex < -1 /* i.e. higher than the root object */){
+					Console.log('Too many levels to climb from ' + context.currentPath + ' to ' + 
+						name + '. Will stop at the top.');
+					lastDesiredSegmentIndex = -1;
+				};
+
+				if (lastDesiredSegmentIndex !== -1){					
+					// Get the absolute path of the reference object. 
+					var ancestorPath = currentPathSegments.slice(0, lastDesiredSegmentIndex + 1).join('.');
+
+					// Get the object at that path. We need to use the root object's context for that.
+					var rootContext = this.createContext_(context.rootObj, '', context.rootObj);
+					var ancestorObj = this.getValue_(ancestorPath, rootContext); 
+
+				} else {
+					// It's the root object.
+					ancestorPath = '';
+					ancestorObj = context.rootObj;	
+				};
+
+				// Now build the context to return.
+				var ancestorContext = this.createContext_(ancestorObj, ancestorPath, 
+					context.rootObj);
+
+				// Pass back also a fixed value for name that isn't prefixd with ../
+				ancestorContext.name = name.slice(levels * 3);
+
+				return ancestorContext;
+
+			} else {
+				
+				return context;
 			};
 		},
 
