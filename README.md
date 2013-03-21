@@ -106,8 +106,8 @@ The value of `output` is:
   one.
 * Inside the loop, the data object is the current member of the collection being iterated. In the 
   example below `{{name}}` is used twice, but the second instance refers to a different person.
-** Inside a loop, you can still access the parent object by prefixing the property name with `../`
-   or `../../` etc. 
+  * Inside a loop, you can still access the parent object by prefixing the property name with `../`
+    or `../../` etc. 
 * Not only arrays can be iterated. Objects can be iterated, as well as anything that has a `forEach` 
   method. 
 
