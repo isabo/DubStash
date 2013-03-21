@@ -241,7 +241,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 						} else {
 							// Bad 'if' statement. Log it and move on.
-							Console.log('Bad condition: ' + match[0]);
+							console.log('Bad condition: ' + match[0]);
 						};
 						break;
 
@@ -279,7 +279,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 							// An else outside an if?!
 							// Put it back in the output to show the problem.
 							this.addTextBlock_(match[0]);
-							Console.log('Unexpected {{else}} encountered!');	
+							console.log('Unexpected {{else}} encountered!');	
 						};
 				
 						break;
@@ -317,7 +317,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 							// Found the end of a block when none are open? Wrong type of end?
 							// Put it back in the output to show the problem.
 							this.addTextBlock_(match[0]);
-							Console.log('Unexpected {{end}} encountered!');
+							console.log('Unexpected {{end}} encountered!');
 						};
 						break;
 
@@ -333,7 +333,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			} else {
 
 				// Brackets are not balanced: ignore and continue.
-				Console.log('Unbalanced brackets encountered: ' + match[0]);
+				console.log('Unbalanced brackets encountered: ' + match[0]);
 			};
 		};
 
@@ -344,7 +344,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		this.addTextBlock_(match);
 
 		if (this.openBlocks_.length){
-			Console.log('Missing {{end}}!');
+			console.log('Missing {{end}}!');
 		};
 
 		// this.topLevelBlocks_ now contains all the info needed in order to render.
@@ -1049,7 +1049,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				var currentPathSegments = (context.currentPath).split('.');
 				var lastDesiredSegmentIndex = currentPathSegments.length - levels - 1;
 				if (lastDesiredSegmentIndex < -1 /* i.e. higher than the root object */){
-					Console.log('Too many levels to climb from ' + context.currentPath + ' to ' + 
+					console.log('Too many levels to climb from ' + context.currentPath + ' to ' + 
 						name + '. Will stop at the top.');
 					lastDesiredSegmentIndex = -1;
 				};
@@ -1176,15 +1176,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	};
 
 
-	/**
-	 * Define a console that can be used anywhere. Closure doesn't like console.log, but 
-	 * window.console is OK. However, in Node, there is no 'window', but 'console' is a global.
-	 */
-	var Console = /** @suppress {checkVars} Ignore the unprefixed 'console'. */(function(){
-		return this.console /* works in browsers, doesn't throw Node */ || console /* for Node*/; 
-	})();
-
-
 	// Make Runtime available externally under its proper name (Closure renames it internally)
 	// Ditto for the methods that are called from precompiled code. @expose tags could have 
 	// achieved this, but the compiled (not pre-compiled) functions would have been larger, as they
@@ -1204,12 +1195,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	this['DubStash'] = DubStash;
 	
 
-	// Make available in Node. Encased in function to allow the @suppress tag to be honoured.
-	/** @suppress {checkVars} */
-	(function(){
-		try{
-			module['exports'] = DubStash;
-		} catch (ex){};
-	})();
-
+	// Make available in Node. 
+	try{
+		module.exports = DubStash;
+	} catch (ex){};
+	
 })();

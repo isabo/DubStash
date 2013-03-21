@@ -27,6 +27,18 @@ Collection_.prototype.length;
 var Collection;
 
 
+// Allow use of console without the 'window.' prefix, which doesn't work in Node.
+var console = {
+	/** @param {...*} var_args */
+	log: function(var_args){}
+};
+
+// Allow use of module.exports for Node.
+var module = {
+	exports: {}
+};
+
+
 /*
  The following are not an external objects. The typedefs below are for enforcing type/param 
  definitions only, without having to declare the typpedefs in dubstash.js, where they would have 
