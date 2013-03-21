@@ -31,7 +31,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	var DubStash = {
 	
-		'VERSION': '1.0.0.rc1',
+		'VERSION': '1.0.0.rc2',
 
 		/**
 		 * Get a function that when called writes out the template while performing the necessary 
@@ -1199,5 +1199,5 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	try{
 		module.exports = DubStash;
 	} catch (ex){};
-	
+
 })();

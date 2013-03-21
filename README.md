@@ -208,7 +208,7 @@ var source = DubStash.precompile(template);
 ## Deploying
 
 Your HTML file needs to use the DubStash script. Use the distributable version 
-[dubstash.min.js](https://raw.github.com/isabo/DubStash/1.0.0.rc1/distributable/dubstash.min.js).
+[dubstash.min.js](https://raw.github.com/isabo/DubStash/1.0.0.rc2/distributable/dubstash.min.js).
 
 ```html
 <html>
