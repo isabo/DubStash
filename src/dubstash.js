@@ -966,14 +966,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 			// Drill down to the end of the multi.segment.name, changing the context as we go.
 			// Cycle through all except the last segment.
+
+			// First: clone the context, because don't want to change the original.
+			var drilledContext = this.createContext_(context.currentObj, context.currentPath, 
+				context.rootObj);
 			var segments = name.split('.');
 			var lastSegmentIndex = segments.length - 1; 
 			for (var i = 0; i < lastSegmentIndex; i++){
-				var nextObj = this.evaluate_(context.currentObj, segments[i]);
+				var nextObj = this.evaluate_(drilledContext.currentObj, segments[i]);
 				if (nextObj !== undefined){
-					var nextPath = [context.currentPath, segments[i]].join('.');
-					context.currentObj = nextObj;
-					context.currentPath = nextPath;
+					var nextPath = drilledContext.currentPath ? 
+						[drilledContext.currentPath, segments[i]].join('.') : segments[i];
+					drilledContext.currentObj = nextObj;
+					drilledContext.currentPath = nextPath;
 				} else {
 					// We cannot drill any further - won't be able to evaluate.
 					return undefined;
@@ -982,7 +987,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 			// Our context now points to an object which we hope has a property accessible using 
 			// the last segment.
-			return this.evaluate_(context.currentObj, segments[lastSegmentIndex]); 
+			return this.evaluate_(drilledContext.currentObj, segments[lastSegmentIndex]); 
 		},
 
 
@@ -998,7 +1003,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 			var value;
 			
-			if (typeof obj[property] === 'function'){
+			if (obj === null){
+				// The object could have been an empty {} or [] that we converted to null. Either
+				// way, it does not have the desired property.
+				return undefined;
+
+			} else if (typeof obj[property] === 'function'){
 				// Call it.
 				value = obj[property](); 
 			} else {
