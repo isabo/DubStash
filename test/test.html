@@ -91,7 +91,10 @@
 					result: 'OK',
 					x: {
 						result: 'y'
-					}
+					},
+					recursiveItems: [
+						{name: '{{../../result}}'}
+					]
 				};
 
 				var tests = [
@@ -114,7 +117,8 @@
 					['Iterate empty object', 'O{{foreach emptyObject}}{{char}}{{end foreach}}K', testData4, 'OK'],
 					['Iterate iterable object (forEach)', '{{foreach iterable}}{{char}}{{end foreach}}', testData4, 'OK'],
 					['Climb {{../property}}', '{{foreach items}}{{../../result}}{{end foreach}}', testData5, 'OK'],
-					['Climb &amp; dive {{../object.property}}', '{{foreach items}}{{name}}{{../../x.result}}{{end foreach}}', testData5, 'oney']
+					['Climb &amp; dive {{../object.property}}', '{{foreach items}}{{name}}{{../../x.result}}{{end foreach}}', testData5, 'oney'],
+					['Climb in recursive template from inside iteration', '{{foreach recursiveItems}}{{name /r}}{{end foreach}}', testData5, 'OK']
 				];
 
 				function runTest(description, template, testData, expectedResult){

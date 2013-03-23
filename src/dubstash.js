@@ -38,7 +38,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		 * substitutions.
 		 *
 		 * @param {string} text The template text.
-		 * @return {function(Object, boolean=):string}
+		 * @return {function(Object, boolean=, Object=):string}
 		 * Where the params of the returned function are:
 		 * 	{Object} data An object whose fields will be substituted into the placeholders, or  
 		 *		tested by conditions.
@@ -134,9 +134,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		// Return a function that calls the block rendering functions and strings together the 
 		// results. Partially bind the runtime function to the rendering functions generated using 
 		// design time configuration settings.
-		return /** @type {function(Object, boolean=):string}*/(function (data, opt_ignoreUndefined){
+		return /** @type {function(Object, boolean=):string}*/(function (data, opt_ignoreUndefined, startContext){
 
-			return Runtime.renderTemplate(renderers, data, opt_ignoreUndefined);
+			return Runtime.renderTemplate(renderers, data, opt_ignoreUndefined, startContext);
 		});
 	};
 
@@ -812,12 +812,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		 * @param {Array.<Renderer>} renderers
 		 * @param {Object} data
 		 * @param {boolean=} opt_ignoreUndefined
+		 * @param {Context=} opt_startContext Context to start with. This is necessary when 
+		 *		rendering a recursive template inside an iteration. For internal use only.
 		 * @return {string}
 		 */
-		renderTemplate: function(renderers, data, opt_ignoreUndefined){
+		renderTemplate: function(renderers, data, opt_ignoreUndefined, opt_startContext){
 
 			// Create a context for the renderers to use.
-			var context = this.createContext_(data, '', data);
+			var context = opt_startContext || this.createContext_(data, '', data);
 
 			var output = [];
 			for (var i in renderers){
@@ -852,8 +854,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					var text = htmlEscape ? Runtime.htmlEscape_('' + value) : '' + value;
 					if (isRecursive && text.indexOf('{{') !== -1) {
 						// Need to compile text as a mini-template and render it.
-						var render = DubStash.compile(text);
-						text = render.call(null, context.currentObj, ignoreUndefined);
+						var render = this.compileRecursive_(text);
+						text = render.call(null, context.rootObj, ignoreUndefined, context);
 					};
 					return text;
 				};
@@ -942,6 +944,32 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				rootObj: rootObj
 			};
 		},
+
+
+		/**
+		 * Compile the results of a recursive placeholder that was just evaluated. Cache the 
+		 * rendering function for reuse. Caching is especially useful for iterations where each
+		 * item has a recursive placeholder.
+		 *
+		 * @param {string} text
+		 * @return {function(Object, boolean=, Object=):string}
+		 */
+		compileRecursive_: function(text){
+
+			var renderer;
+			if (text){
+				renderer = this.rendererCache_[text];
+			};
+
+			if (!renderer){
+				renderer = DubStash.compile(text);
+				this.rendererCache_[text] = renderer;
+			};
+
+			return renderer;
+		},
+
+		rendererCache_: {},
 
 
 		/**
