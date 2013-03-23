@@ -31,7 +31,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	var DubStash = {
 	
-		'VERSION': '1.0.0.rc3',
+		'VERSION': '1.0.0.rc4',
 
 		/**
 		 * Get a function that when called writes out the template while performing the necessary 
