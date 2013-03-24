@@ -44,6 +44,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		 *		tested by conditions.
 		 *	{boolean=} opt_ignoreUndefined Whether to leave alone placeholders whose value is  
 		 *		undefined or to replace them with nothing (default: replace with nothing).
+		 *  {Context=} opt_startContext A context created by calling createContext. Specifies that
+		 *		all paths in the template should be considered relative to the current context 
+		 *		object, and not relative to the 'data' object.
 		 */
 		'compile': function(text){
 
@@ -69,6 +72,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 			var compiler = new Compiler(text);
 			return compiler.getRendererSource();
+		},
+
+
+		/**
+		 * Create a context for use when calling the rendering function that results from 
+		 * compiling a template.
+		 *
+		 * @param {Object} startObj The object that the paths in the template refer to.
+		 * @param {string} startPath The path to the start object from the root object.
+		 * @param {Object} rootObj The root object. Must contain startObj somewhere in its hierarchy.
+		 * @return {Context}
+		 */
+		'createContext': function(startObj, startPath, rootObj){
+
+			return new Context(startObj, startPath, rootObj);
 		}
 	};
 
@@ -134,7 +152,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		// Return a function that calls the block rendering functions and strings together the 
 		// results. Partially bind the runtime function to the rendering functions generated using 
 		// design time configuration settings.
-		return /** @type {function(Object, boolean=):string}*/(function (data, opt_ignoreUndefined, startContext){
+		return /** @type {function(Object, boolean=, Object=):string}*/(function (data, 
+			opt_ignoreUndefined, startContext){
 
 			return Runtime.renderTemplate(renderers, data, opt_ignoreUndefined, startContext);
 		});
@@ -158,9 +177,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		// Return a function that calls the block rendering functions and strings together the
 		// results.
 		return [
-			'function(d, i){',
+			'function(d, i, s){',
 			'	var r = [' + rendererSources.toString() + '];',
-			'	return DubStash.Runtime.renderTemplate(r, d, i);',
+			'	return DubStash.Runtime.renderTemplate(r, d, i, s);',
 			'}'
 		].join('\n');
 	};
@@ -421,7 +440,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Returns a function that when called will generate the run-time text of the block according to
 	 * a supplied data object and options.
 	 *
-	 * @return {Renderer}
+	 * @return {function(Context, boolean=):string}
 	 */
 	TextBlock.prototype.getRenderer = function(){
 
@@ -522,13 +541,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Returns a function that when called will generate the run-time text of the block according to
 	 * a supplied data object and options.
 	 *
-	 * @return {Renderer}
+	 * @return {function(Context, boolean=):string}
 	 */
 	PlaceholderBlock.prototype.getRenderer = function(){
 
 		// Bind the design-time configuration settings to the runtime rendering function.
 		var self = this;
-		return /** @type {Renderer} */(function(context, ignoreUndefined){
+		return /** @type {function(Context, boolean=):string} */(function(context, ignoreUndefined){
 
 			return Runtime.renderPlaceHolderBlock(self.name_, self.isRecursive_, self.htmlEscape_, 
 				context, ignoreUndefined);
@@ -621,7 +640,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Returns a function that when called will generate the run-time text of the block according to
 	 * a supplied data object and options.
 	 *
-	 * @return {Renderer}
+	 * @return {function(Context, boolean=):string}
 	 */
 	ConditionBlock.prototype.getRenderer = function(){
 
@@ -630,7 +649,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var trueRenderers = this.getSubRenderers_(this.trueBlocks_);
 		var falseRenderers = this.getSubRenderers_(this.falseBlocks_);
 
-		return /** @type {Renderer} */(function(context, ignoreUndefined){
+		return /** @type {function(Context, boolean=):string} */(function(context, ignoreUndefined){
 
 			return Runtime.renderConditionBlock(name, trueRenderers, falseRenderers, context, 
 				ignoreUndefined);
@@ -661,7 +680,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Get an array of rendering functions for trueBlocks or falseBlocks.
 	 * 
 	 * @param {!Array.<Object>} blocks Either trueBlocks or falseBlocks.
-	 * @return {!Array.<Renderer>} Array of rendering functions to call at 
+	 * @return {!Array.<function(Context, boolean=):string>} Array of rendering functions to call at 
 	 *		runtime.
 	 * @private
 	 */
@@ -722,13 +741,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Returns a function that when called will generate the run-time text of the block according to
 	 * a supplied data object and options.
 	 *
-	 * @return {Renderer}
+	 * @return {function(Context, boolean=):string}
 	 */
 	IteratorBlock.prototype.getRenderer = function(){
 
 		// Bind the design-time configuration settings to the runtime rendering function.
 		var self = this;
-		return /** @type {Renderer} */(function(context, ignoreUndefined){
+		return /** @type {function(Context, boolean=):string} */(function(context, ignoreUndefined){
 
 			return Runtime.renderIteratorBlock(self.name_, self.getSubRenderers_(),	context,
 				ignoreUndefined);
@@ -768,7 +787,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	/**
 	 * Get an array of rendering functions for trueBlocks or falseBlocks.
 	 * 
-	 * @return {!Array.<Renderer>} Array of rendering functions to call at
+	 * @return {!Array.<function(Context, boolean=):string>} Array of rendering functions to call at
 	 *		runtime.
 	 * @private
 	 */
@@ -802,6 +821,28 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 
+	/** 
+	 * Allows the runtime to keep track of which is the current object in the hierarchy.
+	 * 
+	 * @param {Object} currentObj 
+	 * @param {string} currentPath The path to the current object from the root object.
+	 * @param {Object} rootObj The root object. Must contain currentObj somewhere in its 
+	 *		hierarchy.
+	 * @constructor
+	 */
+	var Context = function(currentObj, currentPath, rootObj){
+
+		/** @type {Object} */
+		this.currentObj = currentObj;
+
+		/** @type {string} */
+		this.currentPath = currentPath;
+
+		/** @type {Object} */
+		this.rootObj = rootObj;
+	};
+
+
 	/**
 	 * A collection of methods for rendering compiled blocks once we have the data available to plug
 	 * in, i.e. at "runtime". This is all that is needed by precompiled rendering functions.
@@ -809,7 +850,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	var Runtime = {
 
 		/** 
-		 * @param {Array.<Renderer>} renderers
+		 * @param {Array.<function(Context, boolean=):string>} renderers
 		 * @param {Object} data
 		 * @param {boolean=} opt_ignoreUndefined
 		 * @param {Context=} opt_startContext Context to start with. This is necessary when 
@@ -819,7 +860,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		renderTemplate: function(renderers, data, opt_ignoreUndefined, opt_startContext){
 
 			// Create a context for the renderers to use.
-			var context = opt_startContext || this.createContext_(data, '', data);
+			var context = opt_startContext || new Context(data, '', data);
 
 			var output = [];
 			for (var i in renderers){
@@ -865,8 +906,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		/**
 		 * @param {string} name
-		 * @param {Array.<Renderer>} trueRenderers
-		 * @param {Array.<Renderer>} falseRenderers
+		 * @param {Array.<function(Context, boolean=):string>} trueRenderers
+		 * @param {Array.<function(Context, boolean=):string>} falseRenderers
  		 * @param {Context} context 
 		 * @param {boolean=} ignoreUndefined
 		 * @return {string}
@@ -890,7 +931,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		/**
 		 * @param {string} name
-		 * @param {Array.<Renderer>} subRenderers
+		 * @param {Array.<function(Context, boolean=):string>} subRenderers
 		 * @param {Context} context
 		 * @param {boolean=} ignoreUndefined
 		 * @return {string}
@@ -913,7 +954,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				memberPath += '.[item]';
 
 				// Create a general context, which will be customised for each item.
-				var itemContext = this.createContext_(null, memberPath, context.rootObj);
+				var itemContext = new Context(null, memberPath, context.rootObj);
 
 				this.forEach_(collection, function(member){
 					for (var i in subRenderers){
@@ -924,25 +965,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			};
 
 			return output.join('');
-		},
-
-
-		/**
-		 * Create a context object to pass to a renderer.
-		 *
-		 * @param {Object} currentObj The current data object. 
-		 * @param {string} currentPath The full name of the current object in multi.level.notation.
-		 * @param {Object} rootObj The original data object provided to the renderTemplate method.
-		 * @return {Context}
-		 * @private
-		 */ 
-		createContext_: function(currentObj, currentPath, rootObj){
-
-			return {
-				currentObj: currentObj,
-				currentPath: currentPath,
-				rootObj: rootObj
-			};
 		},
 
 
@@ -996,7 +1018,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			// Cycle through all except the last segment.
 
 			// First: clone the context, because don't want to change the original.
-			var drilledContext = this.createContext_(context.currentObj, context.currentPath, 
+			var drilledContext = new Context(context.currentObj, context.currentPath, 
 				context.rootObj);
 			var segments = name.split('.');
 			var lastSegmentIndex = segments.length - 1; 
@@ -1097,7 +1119,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					var ancestorPath = currentPathSegments.slice(0, lastDesiredSegmentIndex + 1).join('.');
 
 					// Get the object at that path. We need to use the root object's context for that.
-					var rootContext = this.createContext_(context.rootObj, '', context.rootObj);
+					var rootContext = new Context(context.rootObj, '', context.rootObj);
 					var ancestorObj = this.getValue_(ancestorPath, rootContext); 
 
 				} else {
@@ -1107,8 +1129,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				};
 
 				// Now build the context to return.
-				var ancestorContext = this.createContext_(ancestorObj, ancestorPath, 
-					context.rootObj);
+				var ancestorContext = new Context(ancestorObj, ancestorPath, context.rootObj);
 
 				// Pass back also a fixed value for name that isn't prefixd with ../
 				ancestorContext.name = name.slice(levels * 3);

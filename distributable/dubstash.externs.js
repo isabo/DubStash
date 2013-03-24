@@ -9,7 +9,7 @@ var DubStash = {
 
 	/**
 	 * @param {string} text
-	 * @return {function(Object, boolean=):string}
+	 * @return {DubStash.Renderer}
 	 */
 	compile: function(text){},
 
@@ -18,6 +18,14 @@ var DubStash = {
 	 * @return {string}
 	 */
 	precompile: function(text){},
+
+	/**
+	 * @param {Object} startObj The object that the paths in the template refer to.
+	 * @param {string} startPath The path to the start object from the root object.
+	 * @param {Object} rootObj The root object. Must contain startObj somewhere in its hierarchy.
+	 * @return {Context}
+	 */
+	'createContext': function(startObj, startPath, rootObj){},
 
 
 	Runtime: {
@@ -62,21 +70,5 @@ var DubStash = {
 };
 
 
-/**
- * Type of object that can be used with {{foreach}}.
- *
- * @interface
- */
-DubStash.Iterable_ = function(){};
-
-/** @param {function(Object)} callback */
-DubStash.Iterable_.prototype.forEach = function(callback){};
-
-/** @type {{next: function():Object}} */
-DubStash.Iterable_.prototype.__iterator__;
-
-/** @type {number} */
-DubStash.Iterable_.prototype.length;
-
-/** @typedef {DubStash.Iterable_|Array|Object} */
-DubStash.Iterable;
+/** @typedef {function(Object, boolean=, Object=)} */
+DubStash.Renderer;

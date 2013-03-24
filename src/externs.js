@@ -38,15 +38,3 @@ var module = {
 	exports: {}
 };
 
-
-/*
- The following are not an external objects. The typedefs below are for enforcing type/param 
- definitions only, without having to declare the typpedefs in dubstash.js, where they would have 
- to be outside the closure, as that's the only place typedefs seem to be supported.
-*/
-
-/** @typedef {{currentObj: Object, currentPath: string, rootObj: Object}} */
-var Context;
-
-/** @typedef {function(Context, boolean=):string} */
-var Renderer;
