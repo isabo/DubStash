@@ -13,7 +13,7 @@ DubStash is a fast template engine for minimum-logic HTML templates.
 * {{placeholder}}, {{{don't-escape-this-value}}} [Details...](#basic-usage)
 * {{<strong>if</strong> something}} ... {{else}} ... {{end if}} [Details...](#conditons)
 * {{<strong>foreach</strong> things}} ... {{end foreach}} [Details...](#iterations)
-* [Recursive evaluation](#recursion): {{placeholder **/r**}}
+* [Recursive evaluation](#recursion): {{placeholder **/r**}} or even {{if something **/r**}}
 * [Precompilation of templates to Javascript](#precompilation)
 
 ## Usage
@@ -79,25 +79,6 @@ The value of `output2` is:
 </ul>
 
 <!-- Linebreaks and indents added for clarity -->
-```
-
-### Recursion
-
-Placeholders will be evaluated recursively when the `/r` flag is used:
-
-```js
-var messages = {
-	appName: 'HelloWorld',
-	welcome: 'Thank you for installing "{{appName}}"'
-};
-
-var render = DubStash.compile('<p>{{welcome /r}}</p>');
-var output = render(messages);
-```
-
-The value of `output` is:
-```html
-<p>Thank you for installing "HelloWorld"</p>
 ```
 
 ### Iterations
@@ -184,6 +165,43 @@ The value of `output` is:
 </ul>
 
 <!-- Linebreaks and indents added for clarity -->
+```
+
+### Recursion
+
+If the result of an expression may itself be a template that should be evaluated, use the `/r` flag.
+Recursive evaluation will not double-escape the HTML.
+
+```js
+var person1 = {
+	firstName: 'William',
+	lastName: 'Smith',
+	nickName: 'Bill'
+};
+
+var person2 = {
+	lastName: 'Heisenberg'
+};
+
+// Chooses best name to use for a person in many situations:
+var nameTemplate = '{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}'
+
+// Define the text of a generic letter. If we don't know a person's name, say 'Sir'.
+var letterTemplate = '<p>Dear {{if nameTemplate /r}}{{nameTemplate /r}}{{else}}Sir{{end if}},</p>';
+
+var render = DubStash.compile(letterTemplate);
+var output1 = render(person1);
+var output2 = render(person2);
+```
+
+The value of `output1` is:
+```html
+<p>Dear Bill,</p>
+```
+
+The value of `output2` is:
+```html
+<p>Dear Sir,</p>
 ```
 
 ## Precompilation

@@ -152,7 +152,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		// Return a function that calls the block rendering functions and strings together the 
 		// results. Partially bind the runtime function to the rendering functions generated using 
 		// design time configuration settings.
-		return /** @type {function(Object, boolean=, Object=):string}*/(function (data, 
+		return /** @type {function(Object, boolean=, Context=):string}*/(function (data, 
 			opt_ignoreUndefined, startContext){
 
 			return Runtime.renderTemplate(renderers, data, opt_ignoreUndefined, startContext);
@@ -238,10 +238,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		var match;
 		while ((match = Compiler.PATTERN.exec(this.text_)) !== null){
 
-			if (match[1].length === match[4].length){
+			if (match[1].length === match[5].length){
 				// The brackets are balanced.
 
-				var block, unexpected;
+				var isRecursive, block, unexpected;
 				
 				// Anything between the last {{...}} (or the beginning) and this {{...}} is a text 
 				// block.
@@ -254,7 +254,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 						if (match[3]){
 							// We have the beginning of a condition, e.g.: {{if x}}
-							block = new ConditionBlock(match[3]);
+							isRecursive = (match[4] === '/r');
+							block = new ConditionBlock(match[3], isRecursive);
 							this.addBlock_(block);
 							this.openBlocks_.push(block);
 
@@ -344,7 +345,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					default:
 						// A regular placeholder.
 						var htmlEscape = (match[1].length === 2);
-						var isRecursive = (match[3] === '/r');
+						isRecursive = (match[3] === '/r');
 						block = new PlaceholderBlock(match[2], isRecursive, htmlEscape);
 						this.addBlock_(block);					
 				};
@@ -417,7 +418,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @const
 	 * @type {RegExp}
 	 */
-	Compiler.PATTERN = /({{2,3})\s*([^}\s]+)\s*([^}]*)?(}{2,3})/g;
+	Compiler.PATTERN = /(\{{2,3})\s*([^\}\s]*)\s*([^\}\s]*)?\s*([^\}\s]*)?(\}{2,3})/g;
 
 
 	/**
@@ -584,15 +585,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Represents a condition block to be evaluated at runtime.
 	 *
 	 * @param {string} name The name of the field to evaluate up at runtime.
+	 * @param {boolean} isRecursive Whether to treat the resulting value as a template and evaluate 
+	 *		that.
 	 * @constructor
 	 */
-	var ConditionBlock = function(name){
+	var ConditionBlock = function(name, isRecursive){
 
 		/**
 		 * @type {string}
 		 * @private
 		 */
 		this.name_ = name;
+
+		/**
+		 * @type {boolean}
+		 * @private
+		 */
+		this.isRecursive_ = isRecursive;
 
 		/**
 		 * @type {boolean}
@@ -646,13 +655,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		// Bind the design-time configuration settings to the runtime rendering function.
 		var name = this.name_;
+		var isRecursive = this.isRecursive_;
 		var trueRenderers = this.getSubRenderers_(this.trueBlocks_);
 		var falseRenderers = this.getSubRenderers_(this.falseBlocks_);
 
 		return /** @type {function(Context, boolean=):string} */(function(context, ignoreUndefined){
 
-			return Runtime.renderConditionBlock(name, trueRenderers, falseRenderers, context, 
-				ignoreUndefined);
+			return Runtime.renderConditionBlock(name, isRecursive, trueRenderers, falseRenderers, 
+				context, ignoreUndefined);
 		});
 	};
 
@@ -668,9 +678,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		return [
 			'function(c, i){',
 			'	var n = "' + this.name_ + '";',
+			'	var r = ' + this.isRecursive_ + ';',
 			'	var t = [' + this.getSubRendererSources_(this.trueBlocks_).toString() + '];',
 			'	var f = [' + this.getSubRendererSources_(this.falseBlocks_).toString() + '];',
-			'	return DubStash.Runtime.renderConditionBlock(n, t, f, c, i);',
+			'	return DubStash.Runtime.renderConditionBlock(n, r, t, f, c, i);',
 			'}'
 		].join('\n');
 	};
@@ -892,7 +903,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				if (value === undefined || value === null){
 					return '';
 				} else {
+					// Escape it BEFORE recursing - this will prevent double-escaping the results
+					// from a recursed template.
 					var text = htmlEscape ? Runtime.htmlEscape_('' + value) : '' + value;
+
+					// Recurse if required.
 					if (isRecursive && text.indexOf('{{') !== -1) {
 						// Need to compile text as a mini-template and render it.
 						var render = this.compileRecursive_(text);
@@ -906,16 +921,26 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		/**
 		 * @param {string} name
+		 * @param {boolean} isRecursive
 		 * @param {Array.<function(Context, boolean=):string>} trueRenderers
 		 * @param {Array.<function(Context, boolean=):string>} falseRenderers
  		 * @param {Context} context 
 		 * @param {boolean=} ignoreUndefined
 		 * @return {string}
 		 */
-		renderConditionBlock: function(name, trueRenderers, falseRenderers, context, ignoreUndefined){
+		renderConditionBlock: function(name, isRecursive, trueRenderers, falseRenderers, context, ignoreUndefined){
+
+			// Get the value, recursively if necessary.
+			var value = Runtime.getValue_(name, context);
+			// Recurse only if the value starts with {{ (and strictly speaking, ends with }}). 
+			// Otherwise, there is something apart from template directives, i.e. it will 
+			// evaluate to truthy anyway.
+			if (value && isRecursive && value.slice(0,2) === '{{' && value.slice(-2) === '}}'){
+				var render = this.compileRecursive_(value);
+				value = render.call(null, context.rootObj, false, context);
+			};
 
 			// Decide which set of renderers to use.
-			var value = Runtime.getValue_(name, context);
 			var renderers = value ? trueRenderers : falseRenderers;
 
 			// Call the appropriate set of rendering functions in turn, and string the results 

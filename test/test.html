@@ -97,6 +97,14 @@
 					]
 				};
 
+				// Recursive conditions.
+				var testData6 = {
+					name: 'John',
+					descriptionTemplate: 'This is a description of {{name}}',
+					summaryTemplate: '{{descriptionTemplate /r}}',
+					deadEndTemplate: '{{nothing}}'
+				};
+
 				var tests = [
 					['Regular placeholder', '{{result}}', testData1, 'OK'],
 					['Non-existent placeholder', 'O{{noSuchProperty}}K', testData1, 'OK'],
@@ -118,7 +126,10 @@
 					['Iterate iterable object (forEach)', '{{foreach iterable}}{{char}}{{end foreach}}', testData4, 'OK'],
 					['Climb {{../property}}', '{{foreach items}}{{../../result}}{{end foreach}}', testData5, 'OK'],
 					['Climb &amp; dive {{../object.property}}', '{{foreach items}}{{name}}{{../../x.result}}{{end foreach}}', testData5, 'oney'],
-					['Climb in recursive template from inside iteration', '{{foreach recursiveItems}}{{name /r}}{{end foreach}}', testData5, 'OK']
+					['Climb in recursive template from inside iteration', '{{foreach recursiveItems}}{{name /r}}{{end foreach}}', testData5, 'OK'],
+					['Recursive condition: truthy without recursing', '{{if descriptionTemplate /r}}{{descriptionTemplate /r}}{{end if}}', testData6, 'This is a description of John'],
+					['Recursive condition: truthy after recursing', '{{if summaryTemplate /r}}{{summaryTemplate /r}}{{end if}}', testData6, 'This is a description of John'],
+					['Recursive condition: falsy after recursing', '{{if deadEndTemplate /r}}{{deadEndTemplate /r}}{{else}}OK{{end if}}', testData6, 'OK']
 				];
 
 				function runTest(description, template, testData, expectedResult){

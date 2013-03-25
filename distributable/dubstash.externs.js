@@ -34,9 +34,10 @@ var DubStash = {
 		 * @param {Array.<function(Object, boolean=):string>} renderers
 		 * @param {Object} data
 		 * @param {boolean=} opt_ignoreUndefined
+		 * @param {Object=} opt_startContext
 		 * @return {string}
 		 */
-		renderTemplate: function(renderers, data, opt_ignoreUndefined){},
+		renderTemplate: function(renderers, data, opt_ignoreUndefined, opt_startContext){},
 
 		/**
 		 * @param {string} name
@@ -50,13 +51,14 @@ var DubStash = {
 
 		/**
 		 * @param {string} name
+		 * @param {boolean} isRecursive
 		 * @param {Array.<function(Object, boolean=):string>} trueRenderers
 		 * @param {Array.<function(Object, boolean=):string>} falseRenderers
 		 * @param {Object} data
 		 * @param {boolean=} ignoreUndefined
 		 * @return {string}
 		 */
-		renderConditionBlock: function(name, trueRenderers, falseRenderers, data, ignoreUndefined){},
+		renderConditionBlock: function(name, isRecursive, trueRenderers, falseRenderers, data, ignoreUndefined){},
 
 		/**
 		 * @param {string} name
