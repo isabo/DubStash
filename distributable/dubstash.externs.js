@@ -23,7 +23,7 @@ var DubStash = {
 	 * @param {Object} startObj The object that the paths in the template refer to.
 	 * @param {string} startPath The path to the start object from the root object.
 	 * @param {Object} rootObj The root object. Must contain startObj somewhere in its hierarchy.
-	 * @return {Context}
+	 * @return {Object}
 	 */
 	'createContext': function(startObj, startPath, rootObj){},
 
