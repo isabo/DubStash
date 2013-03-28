@@ -6,6 +6,8 @@ DubStash is a fast template engine for minimum-logic HTML templates.
 * Works in browsers or on a back-end Node server.
 * Compile templates at runtime; use repeatedly.
 * Precompile templates to Javascript at build time for even faster loading.
+* Recursive evaluation &mdash; easier to use than 'partials' and 'helpers' in other templating
+  engines. 
 
 ## tl;dr
 
@@ -170,6 +172,8 @@ The value of `output` is:
 ### Recursion
 
 If the result of an expression may itself be a template that should be evaluated, use the `/r` flag.
+This allows templates to be constructed out of sub-templates, and provides similar functionality to
+'partials' and 'helpers' in other templating engines.
 Recursive evaluation will not double-escape the HTML.
 
 ```js
@@ -184,7 +188,7 @@ var person2 = {
 };
 
 // Chooses best name to use for a person in many situations:
-var nameTemplate = '{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}'
+var nameTemplate = '{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}';
 
 // Define the text of a generic letter. If we don't know a person's name, say 'Sir'.
 var letterTemplate = '<p>Dear {{if nameTemplate /r}}{{nameTemplate /r}}{{else}}Sir{{end if}},</p>';
