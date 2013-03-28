@@ -26,8 +26,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 (function(){
 
 	/**
-	 * This is the public interface to the library. The method names are quoted to prevent Google 
-	 * Closure from renaming them.
+	 * This is the public interface to the library.
 	 */
 	var DubStash = {
 	
@@ -47,8 +46,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		 *  {Context=} opt_startContext A context created by calling createContext. Specifies that
 		 *		all paths in the template should be considered relative to the current context 
 		 *		object, and not relative to the 'data' object.
+		 * @expose
 		 */
-		'compile': function(text){
+		compile: function(text){
 
 			var compiler = new Compiler(text);
 			return compiler.getRenderer();
@@ -67,8 +67,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		 *		tested by conditions.
 		 *	{boolean=} opt_ignoreUndefined Whether to leave alone placeholders whose value is 
 		 *		undefined or to replace them with nothing (default: replace with nothing).
+		 * @expose
 		 */
-		'precompile': function(text){
+		precompile: function(text){
 
 			var compiler = new Compiler(text);
 			return compiler.getRendererSource();
@@ -83,8 +84,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		 * @param {string} startPath The path to the start object from the root object.
 		 * @param {Object} rootObj The root object. Must contain startObj somewhere in its hierarchy.
 		 * @return {Context}
+		 * @expose
 		 */
-		'createContext': function(startObj, startPath, rootObj){
+		createContext: function(startObj, startPath, rootObj){
 
 			return new Context(startObj, startPath, rootObj);
 		}
