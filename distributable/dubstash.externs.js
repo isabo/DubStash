@@ -23,7 +23,14 @@ var DubStash = {
 	 * @param {string} name A unique name for the template.
 	 * @param {string} text The uncompiled text of the template.
 	 */
-	registerGlobal: function(name, text){},
+	registerGlobalTemplate: function(name, text){},
+
+	/**
+	 * @param {string} name A unique name for the data.
+	 * @param {Object|string} data The data object or string.
+	 * @expose
+	 */
+	registerGlobalData: function(name, data){},
 
 	/**
 	 * @param {Object} startObj The object that the paths in the template refer to.

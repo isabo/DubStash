@@ -78,15 +78,29 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 		/**
 		 * Register a named sub-template that can be used anywhere in the hierarchy without changing
-		 * context (i.e. without prefixing with ../ etc.).
+		 * context (i.e. without prefixing with ../ etc.), as if it is the value of a property.
 		 *
 		 * @param {string} name A unique name for the template.
 		 * @param {string} text The uncompiled text of the template.
 		 * @expose
 		 */
-		registerGlobal: function(name, text){
+		registerGlobalTemplate: function(name, text){
 
-			Runtime.registerGlobal(name, DubStash.compile(text));
+			Runtime.registerGlobalRenderer(name, DubStash.compile(text));
+		},
+
+
+		/**
+		 * Register a named data object that can be used anywhere in the hierarchy without changing
+		 * context (i.e. without prefixing with ../ etc.).
+		 *
+		 * @param {string} name A unique name for the data.
+		 * @param {Object|string} data The data object or string.
+		 * @expose
+		 */
+		registerGlobalData: function(name, data){
+
+			Runtime.registerGlobalData(name, data);
 		},
 
 
@@ -883,12 +897,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		 * @param {string} name A unique name for the template.
 		 * @param {function(Object, boolean=, Object=):string} renderer A rendering function.
 		 */
-		registerGlobal: function(name, renderer){
+		registerGlobalRenderer: function(name, renderer){
 
-			Runtime.globalRenderers_[name] = renderer;
+			this.globalRenderers_[name] = renderer;
 		},
 
 		globalRenderers_: {},
+
+
+		/**
+		 * Register a named data object that can be used anywhere in the hierarchy without changing
+		 * context (i.e. without prefixing with ../ etc.).
+		 *
+		 * @param {string} name A unique name for the data.
+		 * @param {Object|string} data The data object or string.
+		 */
+		registerGlobalData: function(name, data){
+
+			this.globalData_[name] = data;
+		},
+
+		globalData_: {},
 
 
 		/** 
@@ -1068,6 +1097,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			// getAncestorContext_ actually did it for us.
 			if (context.name){
 				name = context.name;
+				var climbed = true;
 			};
 
 			// Drill down to the end of the multi.segment.name, changing the context as we go.
@@ -1086,14 +1116,26 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 					drilledContext.currentObj = nextObj;
 					drilledContext.currentPath = nextPath;
 				} else {
-					// We cannot drill any further - won't be able to evaluate.
-					return undefined;
+					// Cannot complete the path using the local data context.
+					// Try using the global context.
+					if (context !== this.globalContext_ && !climbed){
+						return this.getValue_(name, this.globalContext_);
+					} else {
+						return undefined;
+					};
 				};
 			};
 
 			// Our context now points to an object which we hope has a property accessible using 
 			// the last segment.
-			return this.evaluate_(drilledContext, segments[lastSegmentIndex]); 
+			var value = this.evaluate_(drilledContext, segments[lastSegmentIndex]); 
+
+			if (context !== this.globalContext_ && !climbed && value === undefined){
+				// Couldn't get a value using the local data context. Try using the global context.
+				value = this.getValue_(name, this.globalContext_);
+			};
+
+			return value;
 		},
 
 
@@ -1115,19 +1157,22 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				// way, it does not have the desired property.
 				return undefined;
 
-			} else if (typeof obj[property] === 'function'){
-				// Call it.
-				value = obj[property](); 
-			} else {
-				if (property in obj){
-					value = obj[property];
+			} else if (property in obj){
+
+				if (typeof obj[property] === 'function'){
+					// Call it.
+					value = obj[property](); 
+
 				} else {
-					// Is it a global property?
-					var renderer = Runtime.globalRenderers_[property];
-					if (renderer){
-						value = renderer.call(null, context.rootObj, undefined, context);
-					};
+					value = obj[property];
 				};
+
+			} else {
+				// Is it a global template?
+				var renderer = this.globalRenderers_[property];
+				if (renderer){
+					value = renderer.call(null, context.rootObj, undefined, context);
+				};				
 			};
 
 			// If the value is an empty array or an object with no values, return null. This
@@ -1298,6 +1343,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		 */
 		RE_QUOT_: /\"/g
 	};
+	Runtime.globalContext_ = new Context(Runtime.globalData_, '', Runtime.globalData_);
 
 
 	// Make Runtime available externally under its proper name (Closure renames it internally)

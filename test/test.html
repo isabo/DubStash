@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<script src="../distributable/dubstash.min.js"></script>		
-		<!--script src="../src/dubstash.js"></script-->
+		<!--script src="../distributable/dubstash.min.js"></script-->		
+		<script src="../src/dubstash.js"></script>
 	</head>
 	<body>
 
@@ -110,8 +110,10 @@
 					name: 'John Smith',
 					age: 35
 				};
-				DubStash.registerGlobal('ageInWords', '{{age}} years old');
+				DubStash.registerGlobalTemplate('ageInWords', '{{age}} years old');
 
+				// Global data.
+				DubStash.registerGlobalData('globalProperty', 'OK');
 
 				var tests = [
 					['Regular placeholder', '{{result}}', testData1, 'OK'],
@@ -139,7 +141,8 @@
 					['Recursive condition: truthy after recursing', '{{if summaryTemplate /r}}{{summaryTemplate /r}}{{end if}}', testData6, 'This is a description of John'],
 					['Recursive condition: falsy after recursing', '{{if deadEndTemplate /r}}{{deadEndTemplate /r}}{{else}}OK{{end if}}', testData6, 'OK'],
 					['Global template', '{{name}}, {{ageInWords}}', testData7, 'John Smith, years old'],
-					['Global template, recursive', '{{name}}, {{ageInWords /r}}', testData7, 'John Smith, 35 years old']
+					['Global template, recursive', '{{name}}, {{ageInWords /r}}', testData7, 'John Smith, 35 years old'],
+					['Global data', '{{globalProperty}}', testData1, 'OK']
 				];
 
 				function runTest(description, template, testData, expectedResult){
