@@ -30,7 +30,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	var DubStash = {
 	
-		'VERSION': '1.0.0.rc5',
+		'VERSION': '1.0.0.rc6',
 
 		/**
 		 * Get a function that when called writes out the template while performing the necessary 
@@ -73,6 +73,20 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 			var compiler = new Compiler(text);
 			return compiler.getRendererSource();
+		},
+
+
+		/**
+		 * Register a named sub-template that can be used anywhere in the hierarchy without changing
+		 * context (i.e. without prefixing with ../ etc.).
+		 *
+		 * @param {string} name A unique name for the template.
+		 * @param {string} text The uncompiled text of the template.
+		 * @expose
+		 */
+		registerGlobal: function(name, text){
+
+			Runtime.registerGlobal(name, DubStash.compile(text));
 		},
 
 
@@ -862,6 +876,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	var Runtime = {
 
+		/**
+		 * Register a named sub-template that can be used anywhere in the hierarchy without changing
+		 * context (i.e. without prefixing with ../ etc.).
+		 *
+		 * @param {string} name A unique name for the template.
+		 * @param {function(Object, boolean=, Object=):string} renderer A rendering function.
+		 */
+		registerGlobal: function(name, renderer){
+
+			Runtime.globalRenderers_[name] = renderer;
+		},
+
+		globalRenderers_: {},
+
+
 		/** 
 		 * @param {Array.<function(Context, boolean=):string>} renderers
 		 * @param {Object} data
@@ -1050,7 +1079,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			var segments = name.split('.');
 			var lastSegmentIndex = segments.length - 1; 
 			for (var i = 0; i < lastSegmentIndex; i++){
-				var nextObj = this.evaluate_(drilledContext.currentObj, segments[i]);
+				var nextObj = this.evaluate_(drilledContext, segments[i]);
 				if (nextObj !== undefined){
 					var nextPath = drilledContext.currentPath ? 
 						[drilledContext.currentPath, segments[i]].join('.') : segments[i];
@@ -1064,20 +1093,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 			// Our context now points to an object which we hope has a property accessible using 
 			// the last segment.
-			return this.evaluate_(drilledContext.currentObj, segments[lastSegmentIndex]); 
+			return this.evaluate_(drilledContext, segments[lastSegmentIndex]); 
 		},
 
 
 		/** 
 		 * Evaluates an object property. Empty arrays and objects are falsy.
 		 *
-		 * @param {Object} obj The object that contains the property we want.
+		 * @param {Context} context A context object, where currentObj contains the property we want.
 		 * @param {string} property The name of the property we want to evaluate.
 		 * @return {*}
 		 * @private
 		 */
-		evaluate_: function(obj, property){
+		evaluate_: function(context, property){
 
+			var obj = context.currentObj;
 			var value;
 			
 			if (obj === null){
@@ -1089,7 +1119,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 				// Call it.
 				value = obj[property](); 
 			} else {
-				value = obj[property];	
+				if (property in obj){
+					value = obj[property];
+				} else {
+					// Is it a global property?
+					var renderer = Runtime.globalRenderers_[property];
+					if (renderer){
+						value = renderer.call(null, context.rootObj, undefined, context);
+					};
+				};
 			};
 
 			// If the value is an empty array or an object with no values, return null. This

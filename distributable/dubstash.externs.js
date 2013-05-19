@@ -20,6 +20,12 @@ var DubStash = {
 	precompile: function(text){},
 
 	/**
+	 * @param {string} name A unique name for the template.
+	 * @param {string} text The uncompiled text of the template.
+	 */
+	registerGlobal: function(name, text){},
+
+	/**
 	 * @param {Object} startObj The object that the paths in the template refer to.
 	 * @param {string} startPath The path to the start object from the root object.
 	 * @param {Object} rootObj The root object. Must contain startObj somewhere in its hierarchy.

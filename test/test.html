@@ -105,6 +105,14 @@
 					deadEndTemplate: '{{nothing}}'
 				};
 
+				// Global templates.
+				var testData7 = {
+					name: 'John Smith',
+					age: 35
+				};
+				DubStash.registerGlobal('ageInWords', '{{age}} years old');
+
+
 				var tests = [
 					['Regular placeholder', '{{result}}', testData1, 'OK'],
 					['Non-existent placeholder', 'O{{noSuchProperty}}K', testData1, 'OK'],
@@ -129,7 +137,9 @@
 					['Climb in recursive template from inside iteration', '{{foreach recursiveItems}}{{name /r}}{{end foreach}}', testData5, 'OK'],
 					['Recursive condition: truthy without recursing', '{{if descriptionTemplate /r}}{{descriptionTemplate /r}}{{end if}}', testData6, 'This is a description of John'],
 					['Recursive condition: truthy after recursing', '{{if summaryTemplate /r}}{{summaryTemplate /r}}{{end if}}', testData6, 'This is a description of John'],
-					['Recursive condition: falsy after recursing', '{{if deadEndTemplate /r}}{{deadEndTemplate /r}}{{else}}OK{{end if}}', testData6, 'OK']
+					['Recursive condition: falsy after recursing', '{{if deadEndTemplate /r}}{{deadEndTemplate /r}}{{else}}OK{{end if}}', testData6, 'OK'],
+					['Global template', '{{name}}, {{ageInWords}}', testData7, 'John Smith, years old'],
+					['Global template, recursive', '{{name}}, {{ageInWords /r}}', testData7, 'John Smith, 35 years old']
 				];
 
 				function runTest(description, template, testData, expectedResult){
