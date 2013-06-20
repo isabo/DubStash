@@ -1,20 +1,19 @@
 DubStash
 ========
 
-DubStash is a fast template engine for minimum-logic HTML templates. 
+DubStash is a fast semantic template engine for HTML. 
 
-* Works in browsers or on a back-end Node server.
-* Compile templates at runtime; use repeatedly.
+* Use it in a client-side browser or on a back-end Node.js server.
+* Compile a template at runtime, then use it repeatedly with different data.
 * Precompile templates to Javascript at build time for even faster loading.
-* Recursive evaluation &mdash; easier to use than 'partials' and 'helpers' in other templating
-  engines. 
 
 ## tl;dr
 
 * `<script src="dubstash.min.js"></script>` [Details...](#deploying)
-* {{placeholder}}, {{{don't-escape-this-value}}} [Details...](#basic-usage)
-* {{<strong>if</strong> something}} ... {{else}} ... {{end if}} [Details...](#conditons)
-* {{<strong>foreach</strong> things}} ... {{end foreach}} [Details...](#iterations)
+* {{[placeholder](#basic-usage)}}, {{{don't-escape-this-value}}}
+* {{<strong>[if](#conditons)</strong> something}} ... {{else}} ... {{end if}}
+* {{<strong>[foreach](#iterations)</strong> things}} ... {{end foreach}}
+* Different templates can make use of common building blocks known as [global templates](#global).
 * [Recursive evaluation](#recursion): {{placeholder **/r**}} or even {{if something **/r**}}
 * [Precompilation of templates to Javascript](#precompilation)
 
@@ -169,14 +168,19 @@ The value of `output` is:
 <!-- Linebreaks and indents added for clarity -->
 ```
 
-### Recursion
+### Global Templates
 
-If the result of an expression may itself be a template that should be evaluated, use the `/r` flag.
-This allows templates to be constructed out of sub-templates, and provides similar functionality to
-'partials' and 'helpers' in other templating engines.
-Recursive evaluation will not double-escape the HTML.
+* Different templates can make use of common building blocks known as global templates. This is 
+  provides similar functionality to 'partials' and 'helpers' in other templating engines.
+* Using a global template will not double-escape your HTML.
 
 ```js
+// 'bestName' is a template that writes out the best name to use for greeting a person:
+DubStash.registerGlobalTemplate('bestName', {{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
+
+// Define the text of a generic letter.
+var renderLetter = DubStash.compile('<p>Dear {{bestName /r}},</p>');
+
 var person1 = {
 	firstName: 'William',
 	lastName: 'Smith',
@@ -184,18 +188,12 @@ var person1 = {
 };
 
 var person2 = {
-	lastName: 'Heisenberg'
+	firstName: 'Frederick',
+	lastName: 'Bloggs'	
 };
 
-// Chooses best name to use for a person in many situations:
-var nameTemplate = '{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}';
-
-// Define the text of a generic letter. If we don't know a person's name, say 'Sir'.
-var letterTemplate = '<p>Dear {{if nameTemplate /r}}{{nameTemplate /r}}{{else}}Sir{{end if}},</p>';
-
-var render = DubStash.compile(letterTemplate);
-var output1 = render(person1);
-var output2 = render(person2);
+var output1 = renderLetter(person1);
+var output2 = renderLetter(person2);
 ```
 
 The value of `output1` is:
@@ -204,6 +202,33 @@ The value of `output1` is:
 ```
 
 The value of `output2` is:
+```html
+<p>Dear Frederick,</p>
+```
+
+### Recursion
+
+* If the result of an expression may itself be a template that should be evaluated, use the `/r` flag.
+* Recursive evaluation will not double-escape the HTML.
+
+In the [global templates](#global) example, the greeting template does not handle a case where
+we don't know a person's first name or nickname. Let's improve it to handle such a case.
+
+```js
+// 'bestName' is a template that writes out the best name to use for greeting a person:
+DubStash.registerGlobalTemplate('bestName', {{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
+
+// Define the text of a generic letter. If we don't know a person's name, say 'Sir'.
+var renderLetter = DubStash.compile('<p>Dear {{if bestName /r}}{{bestName /r}}{{else}}Sir{{end if}},</p>');
+
+var person3 = {
+	lastName: 'Heisenberg'
+};
+
+var output3 = renderLetter(person3);
+```
+
+The value of `output3` is:
 ```html
 <p>Dear Sir,</p>
 ```
