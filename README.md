@@ -210,7 +210,7 @@ The value of `output2` is:
 
 ## Precompilation
 
-* You can precompile templates into Javascript that can be inserted into your source files. 
+* You can precompile templates into Javascript functions that can be inserted into your source files. 
 * Runtime startup will be faster because there will be no need for a `DubStash.compile()` step.
 * You still need to include a link to the DubStash script in your HTML, because precompiled 
   functions still depend on it.
@@ -221,9 +221,9 @@ The value of `output2` is:
 var DubStash = require('./dubstash.js');
 
 var template = 'My name is {{name}}.';
-var source = DubStash.precompile(template);
+var rendererSource = DubStash.precompile(template);
 
-// Write source into a Javascript file.
+// Write the source of the rendering function into a Javascript file. 
 ...
 ```
 

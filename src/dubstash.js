@@ -87,6 +87,37 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		registerGlobalTemplate: function(name, text){
 
 			Runtime.registerGlobalRenderer(name, DubStash.compile(text));
+
+			// Remember the template for use during precompileGlobalTemplates.
+			this.globalTemplates_[name] = text;
+		},
+
+
+		/**
+		 * Cache of global templates. Used only when precompiling global templates.
+		 *
+		 * @type {Object.<string, string>}
+		 * @private
+		 */
+		globalTemplates_: {},
+
+
+		/**
+		 * Get the Javascript source code that, at run time, will register all the current global
+		 * templates, in their precompiled form.
+		 *
+		 * @return {string}
+		 * @expose
+		 */
+		precompileGlobalTemplates: function(){
+
+			var lines = [''];
+			for (var name in this.globalTemplates_){
+				var compiler = new Compiler(this.globalTemplates_[name]);
+				lines.push('DubStash.Runtime.registerGlobalRenderer(\'' + name + '\', ' +
+					compiler.getRendererSource() + ');');	
+			};
+			return lines.join('\n');
 		},
 
 
@@ -1357,6 +1388,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		Runtime['renderPlaceHolderBlock'] = Runtime.renderPlaceHolderBlock;
 		Runtime['renderConditionBlock'] = Runtime.renderConditionBlock;		
 		Runtime['renderIteratorBlock'] = Runtime.renderIteratorBlock;
+		Runtime['registerGlobalRenderer'] = Runtime.registerGlobalRenderer;
 	};
 	
 

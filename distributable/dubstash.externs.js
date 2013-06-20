@@ -26,6 +26,11 @@ var DubStash = {
 	registerGlobalTemplate: function(name, text){},
 
 	/**
+	 * @return {string}
+	 */
+	precompileGlobalTemplates: function(){},
+
+	/**
 	 * @param {string} name A unique name for the data.
 	 * @param {Object|string} data The data object or string.
 	 * @expose
@@ -80,7 +85,13 @@ var DubStash = {
 		 * @param {boolean=} ignoreUndefined
 		 * @return {string}
 		 */
-		renderIteratorBlock: function(name, subRenderers, data, ignoreUndefined){}
+		renderIteratorBlock: function(name, subRenderers, data, ignoreUndefined){},
+
+		/**
+		 * @param {string} name A unique name for the template.
+		 * @param {function(Object, boolean=, Object=):string} renderer A rendering function.
+		 */
+		registerGlobalRenderer: function(name, renderer){}
 	}
 };
 

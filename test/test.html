@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<!--script src="../distributable/dubstash.min.js"></script-->		
-		<script src="../src/dubstash.js"></script>
+		<script src="../distributable/dubstash.min.js"></script>		
+		<!--script src="../src/dubstash.js"></script-->
 	</head>
 	<body>
 
@@ -165,6 +165,7 @@
 
 					var result2 = 'FAILED';
 					try {
+						eval(DubStash.precompileGlobalTemplates());
 						var precompiled = DubStash.precompile(template);
 						var render2 = eval('(' + precompiled + ')');
 						var output2 = render2(testData);
