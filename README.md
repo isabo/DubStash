@@ -13,7 +13,7 @@ DubStash is a fast semantic template engine for HTML.
 * {{[placeholder](#basic-usage)}}, {{{don't-escape-this-triple-stashed-value}}}
 * {{<strong>[if](#conditions)</strong> something}} ... {{else}} ... {{end if}}
 * {{<strong>[foreach](#iterations)</strong> things}} ... {{end foreach}}
-* Different templates can make use of common building blocks known as [global templates](#global).
+* Different templates can make use of common building blocks known as [global templates](#global-templates).
 * [Recursive evaluation](#recursion): {{placeholder **/r**}} or even {{if something **/r**}}
 * [Precompilation of templates to Javascript](#precompilation)
 
@@ -212,7 +212,7 @@ The value of `output2` is:
 * If the result of an expression may itself be a template that should be evaluated, use the `/r` flag.
 * Recursive evaluation will not double-escape the HTML.
 
-In the [global templates](#global) example, the greeting template does not handle a case where
+In the [global templates](#global-templates) example, the greeting template does not handle a case where
 we don't know a person's first name or nickname. Let's improve it to handle such a case.
 
 ```js
