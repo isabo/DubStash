@@ -177,7 +177,8 @@ The value of `output` is:
 
 ```js
 // 'bestName' is a template that writes out the best name to use for greeting a person:
-DubStash.registerGlobalTemplate('bestName', '{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
+DubStash.registerGlobalTemplate('bestName', 
+	'{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
 
 // Define the text of a generic letter.
 var renderLetter = DubStash.compile('<p>Dear {{bestName /r}},</p>');
@@ -212,15 +213,17 @@ The value of `output2` is:
 * If the result of an expression may itself be a template that should be evaluated, use the `/r` flag.
 * Recursive evaluation will not double-escape the HTML.
 
-In the [global templates](#global-templates) example, the greeting template does not handle a case where
-we don't know a person's first name or nickname. Let's improve it to handle such a case.
+In the [global templates](#global-templates) example, the greeting template does not handle a case 
+where we don't know a person's first name or nickname. Let's improve it to handle such a case.
 
 ```js
 // 'bestName' is a template that writes out the best name to use for greeting a person:
-DubStash.registerGlobalTemplate('bestName', '{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
+DubStash.registerGlobalTemplate('bestName', 
+	'{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
 
 // Define the text of a generic letter. If we don't know a person's name, say 'Sir'.
-var renderLetter = DubStash.compile('<p>Dear {{if bestName /r}}{{bestName /r}}{{else}}Sir{{end if}},</p>');
+var renderLetter = DubStash.compile(
+	'<p>Dear {{if bestName /r}}{{bestName /r}}{{else}}Sir{{end if}},</p>');
 
 var person3 = {
 	lastName: 'Heisenberg'
