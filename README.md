@@ -177,7 +177,7 @@ The value of `output` is:
 
 ```js
 // 'bestName' is a template that writes out the best name to use for greeting a person:
-DubStash.registerGlobalTemplate('bestName', {{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
+DubStash.registerGlobalTemplate('bestName', '{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
 
 // Define the text of a generic letter.
 var renderLetter = DubStash.compile('<p>Dear {{bestName /r}},</p>');
@@ -217,7 +217,7 @@ we don't know a person's first name or nickname. Let's improve it to handle such
 
 ```js
 // 'bestName' is a template that writes out the best name to use for greeting a person:
-DubStash.registerGlobalTemplate('bestName', {{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
+DubStash.registerGlobalTemplate('bestName', '{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
 
 // Define the text of a generic letter. If we don't know a person's name, say 'Sir'.
 var renderLetter = DubStash.compile('<p>Dear {{if bestName /r}}{{bestName /r}}{{else}}Sir{{end if}},</p>');
