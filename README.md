@@ -5,13 +5,13 @@ DubStash is a fast semantic template engine for HTML.
 
 * Use it in a client-side browser or on a back-end Node.js server.
 * Compile a template at runtime, then use it repeatedly with different data.
-* Precompile templates to Javascript at build time for even faster loading.
+* Optionally, precompile templates to Javascript at build time for even faster loading.
 
 ## tl;dr
 
 * `<script src="dubstash.min.js"></script>` [Details...](#deploying)
-* {{[placeholder](#basic-usage)}}, {{{don't-escape-this-value}}}
-* {{<strong>[if](#conditons)</strong> something}} ... {{else}} ... {{end if}}
+* {{[placeholder](#basic-usage)}}, {{{don't-escape-this-triple-stashed-value}}}
+* {{<strong>[if](#conditions)</strong> something}} ... {{else}} ... {{end if}}
 * {{<strong>[foreach](#iterations)</strong> things}} ... {{end foreach}}
 * Different templates can make use of common building blocks known as [global templates](#global).
 * [Recursive evaluation](#recursion): {{placeholder **/r**}} or even {{if something **/r**}}
@@ -21,16 +21,17 @@ DubStash is a fast semantic template engine for HTML.
 
 ### Basic Usage
 
-* Define a template that contains `{{placeholders}}` for text that will be substituted at runtime. 
+* Define a template that contains `{{placeholders}}` for values that will be substituted at runtime. 
 * Generate a rendering function by compiling the template.
 * Call the rendering function with an object that contains the data to subsitute for the 
   `{{placeholders}}`. 
 * The text that replaces `{{placeholders}}` is escaped for safe use in HTML, unless you use a 
-  `{{{triple stash}}}` (not shown).
+  `{{{triple-stash}}}` (not shown).
 
 ```js
-// Define the template. 
-// (By the way, the HTML5 <template> tag is a useful place to stick your templates.)
+// Define the template. You normally won't do this using Javascript. Instead you can use the new
+// HTML5 <template> tag, or put your templates inside <script type="text/dubstash">...</script>,
+// and assign the contents to a Javascript variable using the script tag's innerHTML property. 
 var template = '<ul><li>My name is {{name}}.</li>' +
 			   '<li>I live in {{address.city}}.</li>' +
 			   '<li>My favourite cartoon is {{cartoon}}.</li></ul>';	
@@ -170,8 +171,8 @@ The value of `output` is:
 
 ### Global Templates
 
-* Different templates can make use of common building blocks known as global templates. This is 
-  provides similar functionality to 'partials' and 'helpers' in other templating engines.
+* Different templates can make use of common building blocks known as global templates. This 
+  provides similar functionality to 'partials' and 'helpers' used in other templating engines.
 * Using a global template will not double-escape your HTML.
 
 ```js
