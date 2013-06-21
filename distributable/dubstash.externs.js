@@ -70,7 +70,7 @@ var DubStash = {
 	'createContext': function(startObj, startPath, rootObj){},
 
 
-	Runtime: {
+	R: {
 
 		/** 
 		 * @param {Array.<function(Object, boolean=):string>} renderers
