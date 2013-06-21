@@ -243,16 +243,24 @@ The value of `output3` is:
 * Runtime startup will be faster because there will be no need for a `DubStash.compile()` step.
 * You still need to include a link to the DubStash script in your HTML, because precompiled 
   functions still depend on it.
+* Global templates that have already been registered are all compiled together as a single block.
 
 ```js
 // Typically you would do this in Node, where you can save the precompiled functions without having
 // to manually copy/paste them into a .js source file.
 var DubStash = require('./dubstash.js');
 
-var template = 'My name is {{name}}.';
+// 'bestName' is a template that writes out the best name to use for greeting a person:
+DubStash.registerGlobalTemplate('bestName', 
+	'{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
+var globalsSource = DubStash.precompileGlobalTemplates();
+
+var template = 'My name is {{bestName}}.';
 var rendererSource = DubStash.precompile(template);
 
-// Write the source of the rendering function into a Javascript file. 
+// Build the output which should be saved as a JS file.
+var output = globalsSource + '\n';
+output += 'var render = ' + rendererSource;
 ...
 ```
 
