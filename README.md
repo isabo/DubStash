@@ -264,6 +264,12 @@ output += 'var render = ' + rendererSource;
 ...
 ```
 
+The resulting output will look like this:
+```js
+DubStash.Runtime.registerGlobalRenderer('bestName', function( ... ){ ... });
+var render = function( ... ){ ... }
+```
+
 ## Deploying
 
 Your HTML file needs to use the DubStash script. Use the distributable version 
