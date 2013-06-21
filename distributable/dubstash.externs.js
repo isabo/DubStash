@@ -79,7 +79,7 @@ var DubStash = {
 		 * @param {Object=} opt_startContext
 		 * @return {string}
 		 */
-		renderTemplate: function(renderers, data, opt_ignoreUndefined, opt_startContext){},
+		T: function(renderers, data, opt_ignoreUndefined, opt_startContext){},
 
 		/**
 		 * @param {string} name
@@ -89,7 +89,7 @@ var DubStash = {
 		 * @param {boolean=} ignoreUndefined
 		 * @return {string}
 		 */
-		renderPlaceHolderBlock: function(name, isRecursive, htmlEscape, data, ignoreUndefined){},
+		P: function(name, isRecursive, htmlEscape, data, ignoreUndefined){},
 
 		/**
 		 * @param {string} name
@@ -100,7 +100,7 @@ var DubStash = {
 		 * @param {boolean=} ignoreUndefined
 		 * @return {string}
 		 */
-		renderConditionBlock: function(name, isRecursive, trueRenderers, falseRenderers, data, ignoreUndefined){},
+		C: function(name, isRecursive, trueRenderers, falseRenderers, data, ignoreUndefined){},
 
 		/**
 		 * @param {string} name
@@ -109,13 +109,13 @@ var DubStash = {
 		 * @param {boolean=} ignoreUndefined
 		 * @return {string}
 		 */
-		renderIteratorBlock: function(name, subRenderers, data, ignoreUndefined){},
+		I: function(name, subRenderers, data, ignoreUndefined){},
 
 		/**
 		 * @param {string} name A unique name for the template.
 		 * @param {function(Object, boolean=, Object=):string} renderer A rendering function.
 		 */
-		registerGlobalRenderer: function(name, renderer){}
+		G: function(name, renderer){}
 	}
 };
 

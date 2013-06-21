@@ -30,7 +30,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	var DubStash = {
 	
-		'VERSION': '1.0.0.rc6',
+		'VERSION': '1.0.0.rc7',
 
 		/**
 		 * Get a function that, when called, writes out the template while performing the necessary 
@@ -114,8 +114,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			var lines = [''];
 			for (var name in this.globalTemplates_){
 				var compiler = new Compiler(this.globalTemplates_[name]);
-				lines.push('DubStash.Runtime.registerGlobalRenderer(\'' + name + '\', ' +
-					compiler.getRendererSource() + ');');	
+				lines.push('DubStash.R.G(\'' + name + '\', ' + compiler.getRendererSource() + ');');	
 			};
 			return lines.join('\n');
 		},
@@ -251,7 +250,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		return [
 			'function(d, i, s){',
 			'	var r = [' + rendererSources.toString() + '];',
-			'	return DubStash.Runtime.renderTemplate(r, d, i, s);',
+			'	return DubStash.R.T(r, d, i, s);',
 			'}'
 		].join('\n');
 	};
@@ -646,7 +645,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		// the design-time variables into the function.
 		return [
 			'function(c, i){',
-			'	return DubStash.Runtime.renderPlaceHolderBlock(' +
+			'	return DubStash.R.P(' +
 					['"' + this.name_ + '"', this.isRecursive_, this.htmlEscape_].join(', ') + 
 					', c, i);',
 
@@ -771,7 +770,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			'	var r = ' + this.isRecursive_ + ';',
 			'	var t = [' + this.getSubRendererSources_(this.trueBlocks_).toString() + '];',
 			'	var f = [' + this.getSubRendererSources_(this.falseBlocks_).toString() + '];',
-			'	return DubStash.Runtime.renderConditionBlock(n, r, t, f, c, i);',
+			'	return DubStash.R.C(n, r, t, f, c, i);',
 			'}'
 		].join('\n');
 	};
@@ -873,7 +872,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 			'function(c, i){',
 			'	var n = "' + this.name_ + '";',
 			'	var s = [' + this.getSubRendererSources_().toString() + '];',
-			'	return DubStash.Runtime.renderIteratorBlock(n, s, c, i);',
+			'	return DubStash.R.I(n, s, c, i);',
 			'}'
 		].join('\n');
 	};
@@ -1421,19 +1420,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	Runtime.globalContext_ = new Context(Runtime.globalData_, '', Runtime.globalData_);
 
 
-	// Make Runtime available externally under its proper name (Closure renames it internally)
+	// Make Runtime available externally under a predictable and very short name (Closure renames it
+	// internally, to an unpredictable value).
 	// Ditto for the methods that are called from precompiled code. @expose tags could have 
-	// achieved this, but the compiled (not pre-compiled) functions would have been larger, as they
-	// would not even be renamed internally.
-	if (!DubStash['Runtime']){
-		// We have been compiled by Closure - causing things to be renamed.
-		DubStash['Runtime'] = Runtime;
-		Runtime['renderTemplate'] = Runtime.renderTemplate;
-		Runtime['renderPlaceHolderBlock'] = Runtime.renderPlaceHolderBlock;
-		Runtime['renderConditionBlock'] = Runtime.renderConditionBlock;		
-		Runtime['renderIteratorBlock'] = Runtime.renderIteratorBlock;
-		Runtime['registerGlobalRenderer'] = Runtime.registerGlobalRenderer;
-	};
+	// achieved this, but this would force us to use the short names internally at the expense of 
+	// clarity.
+	DubStash['R'] = Runtime;
+	Runtime['T'] = Runtime.renderTemplate;
+	Runtime['P'] = Runtime.renderPlaceHolderBlock;
+	Runtime['C'] = Runtime.renderConditionBlock;		
+	Runtime['I'] = Runtime.renderIteratorBlock;
+	Runtime['G'] = Runtime.registerGlobalRenderer;
 	
 
 	// Break out of this closure, and show Closure Compiler that this file has a side-effect. 
