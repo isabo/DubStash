@@ -140,8 +140,7 @@
 					['Recursive condition: truthy without recursing', '{{if descriptionTemplate /r}}{{descriptionTemplate /r}}{{end if}}', testData6, 'This is a description of John'],
 					['Recursive condition: truthy after recursing', '{{if summaryTemplate /r}}{{summaryTemplate /r}}{{end if}}', testData6, 'This is a description of John'],
 					['Recursive condition: falsy after recursing', '{{if deadEndTemplate /r}}{{deadEndTemplate /r}}{{else}}OK{{end if}}', testData6, 'OK'],
-					['Global template', '{{name}}, {{ageInWords}}', testData7, 'John Smith, years old'],
-					['Global template, recursive', '{{name}}, {{ageInWords /r}}', testData7, 'John Smith, 35 years old'],
+					['Global template', '{{name}}, {{ageInWords /r}}', testData7, 'John Smith, 35 years old'],
 					['Global data', '{{globalProperty}}', testData1, 'OK']
 				];
 
