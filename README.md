@@ -276,7 +276,7 @@ var render = function( ... ){ ... }
 ## Deploying
 
 Your HTML file needs to use the DubStash script. Use the distributable version 
-[dubstash.min.js](https://raw.github.com/isabo/DubStash/1.0.0.rc5/distributable/dubstash.min.js).
+[dubstash.min.js](https://raw.github.com/isabo/DubStash/1.0.0.rc6/distributable/dubstash.min.js).
 
 ```html
 <html>
