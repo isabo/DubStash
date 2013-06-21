@@ -1,5 +1,5 @@
 /*
-	Define some object types that will be passed in to DubStep from other code, and which DubStep
+	Define some object types that will be passed in to DubStash from other code, and which DubStash
 	needs to examine for support of various interfaces. Apart from helping check our code, this 
 	ensures that next, foreach etc. won't be renamed.
 */

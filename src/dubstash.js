@@ -33,7 +33,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		'VERSION': '1.0.0.rc6',
 
 		/**
-		 * Get a function that when called writes out the template while performing the necessary 
+		 * Get a function that, when called, writes out the template while performing the necessary 
 		 * substitutions.
 		 *
 		 * @param {string} text The template text.
@@ -157,36 +157,47 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	/**
 	 * Compiler - knows how to compile a template into a rendering function.
 	 *
+	 * The approach is to break down the text into a series of building blocks, some of which may
+	 * contain other blocks. Each block can be called upon to render itself using provided input.
+	 * In addition, each block knows how to write out the source code for a Javascript function that
+	 * does the same.
+	 *
 	 * @param {string} text The template.
 	 * @constructor
 	 */
 	var Compiler = function(text){
 
 		/**
+		 * The source text of the template that is being compiled.
+		 *
 		 * @type {string}
 		 * @private
 		 */
 		this.text_ = text;
 
-		/**
-		 * @type {boolean}
-		 * @private
-		 */
-		this.isCompiled_ = false;
 
 		/**
+		 * A stack of the hierarchy of blocks currently being analyzed. Once the end of a block is
+		 * reached, it is "closed".
+		 * 
 		 * @type {Array.<Object>}
 		 * @private
 		 */
 		this.openBlocks_ = [];
 
+
 		/**
+		 * Keep track of the position of the last matched regular expression.
+		 *
 		 * @type {number}
 		 * @private
 		 */
 		this.lastIndex_ = 0;
 
+
 		/**
+		 * The series of blocks that make up the template.
+		 *
 		 * @type {Array.<Object>}
 		 * @private
 		 */
@@ -204,7 +215,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	Compiler.prototype.getRenderer = function(){
 
-		// Compile if necessary.
+		// Parse the template into blocks.
 		this.compile_();
 
 		// Ask each block to generate a rendering function.
@@ -286,10 +297,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * @private
 	 */
 	Compiler.prototype.compile_ = function(){
-
-		if (this.isCompiled_){
-			return;
-		};
 
 		// Reset our regexp just in case it was left in an unpredictable state by an incomplete 
 		// parsing operation.
@@ -580,18 +587,26 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	var PlaceholderBlock = function(name, isRecursive, htmlEscape){
 
 		/**
+		 * Name of property to evaluate.
+		 * 
 		 * @type {string}
 		 * @private
 		 */
 		this.name_ = name;
 
+
 		/**
+		 * Whether to evaluate the property recursively.
+		 *
 		 * @type {boolean}
 		 * @private
 		 */
 		this.isRecursive_ = isRecursive;
 
+
 		/**
+		 * Whether to escape the results to make them safe to include in HTML.
+		 *
 		 * @type {boolean}
 		 * @private
 		 */
@@ -607,7 +622,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	PlaceholderBlock.prototype.getRenderer = function(){
 
-		// Bind the design-time configuration settings to the runtime rendering function.
+		// Curry the design-time configuration settings into the runtime rendering function.
 		var self = this;
 		return /** @type {function(Context, boolean=):string} */(function(context, ignoreUndefined){
 
@@ -653,30 +668,44 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	var ConditionBlock = function(name, isRecursive){
 
 		/**
+		 * Name of property to evaluate.
+		 *
 		 * @type {string}
 		 * @private
 		 */
 		this.name_ = name;
 
+
 		/**
+		 * Whether to evaluate the property recursively.
+		 *
 		 * @type {boolean}
 		 * @private
 		 */
 		this.isRecursive_ = isRecursive;
 
+
 		/**
+		 * Whether an {{else}} token has been encountered yet,
+		 *
 		 * @type {boolean}
 		 * @private
 		 */
 		this.foundElse_ = false;
 
+
 		/**
+		 * Series of blocks that apply when the property is truthy.
+		 *
 		 * @type {!Array.<Object>}
 		 * @private
 		 */
 		this.trueBlocks_ = [];
 		
+
 		/**
+		 * Series of blocks that apply when the property is falsy.
+		 *
 		 * @type {!Array.<Object>}
 		 * @private
 		 */
@@ -685,7 +714,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 	/**
-	 * Tell the block that its {{else}} has been encountered. Any subordinate blocks encountered 
+	 * Tell the block that its {{else}} has been encountered. Any subsequent blocks encountered 
 	 * will be 'false' blocks -- blocks to use if the condition evaluates to false.
 	 */
 	ConditionBlock.prototype.foundElse = function(){
@@ -707,14 +736,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 	/**
-	 * Returns a function that when called will generate the run-time text of the block according to
-	 * a supplied data object and options.
+	 * Returns a function that, when called, will generate the run-time text of the block according
+	 * to a supplied data object and options.
 	 *
 	 * @return {function(Context, boolean=):string}
 	 */
 	ConditionBlock.prototype.getRenderer = function(){
 
-		// Bind the design-time configuration settings to the runtime rendering function.
+		// Curry the design-time configuration settings into the runtime rendering function.
 		var name = this.name_;
 		var isRecursive = this.isRecursive_;
 		var trueRenderers = this.getSubRenderers_(this.trueBlocks_);
@@ -796,12 +825,17 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	var IteratorBlock = function(name){
 
 		/**
+		 * Name of property to evaluate.
+		 *
 		 * @type {string}
 		 * @private
 		 */
 		this.name_ = name;
 
+
 		/**
+		 * Series of blocks to iterate for each value of the property.
+		 *
 		 * @type {!Array.<Object>}
 		 * @private
 		 */
@@ -810,14 +844,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 	/**
-	 * Returns a function that when called will generate the run-time text of the block according to
-	 * a supplied data object and options.
+	 * Returns a function that, when called, will generate the run-time text of the block according
+	 * to a supplied data object and options.
 	 *
 	 * @return {function(Context, boolean=):string}
 	 */
 	IteratorBlock.prototype.getRenderer = function(){
 
-		// Bind the design-time configuration settings to the runtime rendering function.
+		// Curry the design-time configuration settings to the runtime rendering function.
 		var self = this;
 		return /** @type {function(Context, boolean=):string} */(function(context, ignoreUndefined){
 
@@ -857,7 +891,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 	/**
-	 * Get an array of rendering functions for trueBlocks or falseBlocks.
+	 * Get an array of rendering functions for the iterable blocks.
 	 * 
 	 * @return {!Array.<function(Context, boolean=):string>} Array of rendering functions to call at
 	 *		runtime.
@@ -894,7 +928,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 	/** 
-	 * Allows the runtime to keep track of which is the current object in the hierarchy.
+	 * Allows the runtime to keep track of which is the current object in the hierarchy, when
+	 * when drilling down through multi.level.objects.
 	 * 
 	 * @param {Object} currentObj 
 	 * @param {string} currentPath The path to the current object from the root object.
@@ -952,6 +987,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 		/** 
+		 * Renders a compiled template (supplied in the form of a series of renderer functions
+		 * that were curried into the calling function).
+		 *
 		 * @param {Array.<function(Context, boolean=):string>} renderers
 		 * @param {Object} data
 		 * @param {boolean=} opt_ignoreUndefined
@@ -973,6 +1011,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 		/**
+		 * Renders the value of a placeholder block.
+		 *
 		 * @param {string} name
 		 * @param {boolean} isRecursive
 		 * @param {boolean} htmlEscape 
@@ -1011,6 +1051,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 		/**
+		 * Evaluates a property for truthiness and renders an appropriate value.
+		 *
 		 * @param {string} name
 		 * @param {boolean} isRecursive
 		 * @param {Array.<function(Context, boolean=):string>} trueRenderers
@@ -1046,6 +1088,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 		/**
+		 * Iterates through a collection and renders the block for each value.
+		 *
 		 * @param {string} name
 		 * @param {Array.<function(Context, boolean=):string>} subRenderers
 		 * @param {Context} context
