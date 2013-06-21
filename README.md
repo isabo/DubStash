@@ -1,11 +1,12 @@
 DubStash
 ========
 
-DubStash is a fast semantic template engine for HTML. 
+DubStash is a fast, lightweight and simple semantic template engine for HTML. 
 
 * Use it in a client-side browser or on a back-end Node.js server.
-* Compile a template at runtime, then use it repeatedly with different data.
+* Compile a template once, then use it repeatedly with different data.
 * Optionally, precompile templates to Javascript at build time for even faster loading.
+* Weight: < 6.5 KB
 
 ## tl;dr
 
