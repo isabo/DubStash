@@ -512,9 +512,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 */
 	TextBlock.prototype.getRenderer = function(){
 
-		var text = this.text_;
+		var self = this;
 		return function(){
-			return text;
+			return self.text_;
 		};
 	};
 
@@ -531,7 +531,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 		// functions lose their scope variables.
 		return [
 			'function(){',
-			'	return "' + this.jsEscape(this.text_) + '";',
+			'	return "' + this.escapedText() + '";',
 			'}'
 		].join('\n');
 	};
@@ -559,15 +559,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 	 * Used by precompiler. Makes text safe for inclusion in precompiled JavaScript. That means 
 	 * escaping any double quotes.
 	 *
-	 * @param {string} text
 	 * @return {string}
 	 * @protected
 	 */
-	TextBlock.prototype.jsEscape = function(text){
+	TextBlock.prototype.escapedText = function(){
 
-		return text.replace(TextBlock.RE_BACKSLASH, '\\\\').
-					replace(TextBlock.RE_DOUBLE_QUOTES, '\\"').
-					replace(TextBlock.RE_NEWLINE, '\\n');
+		return this.text_.replace(TextBlock.RE_BACKSLASH, '\\\\').
+						  replace(TextBlock.RE_DOUBLE_QUOTES, '\\"').
+						  replace(TextBlock.RE_NEWLINE, '\\n');
 	};
 
 
