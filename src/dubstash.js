@@ -1422,15 +1422,19 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	// Make Runtime available externally under a predictable and very short name (Closure renames it
 	// internally, to an unpredictable value).
-	// Ditto for the methods that are called from precompiled code. @expose tags could have 
-	// achieved this, but this would force us to use the short names internally at the expense of 
-	// clarity.
-	DubStash['R'] = Runtime;
-	Runtime['T'] = Runtime.renderTemplate;
-	Runtime['P'] = Runtime.renderPlaceHolderBlock;
-	Runtime['C'] = Runtime.renderConditionBlock;		
-	Runtime['I'] = Runtime.renderIteratorBlock;
-	Runtime['G'] = Runtime.registerGlobalRenderer;
+	// Ditto for the methods that are called from precompiled code. 
+	/** @expose */
+	DubStash.R = Runtime;
+	/** @expose */
+	Runtime.T = Runtime.renderTemplate;
+	/** @expose */
+	Runtime.P = Runtime.renderPlaceHolderBlock;
+	/** @expose */
+	Runtime.C = Runtime.renderConditionBlock;		
+	/** @expose */
+	Runtime.I = Runtime.renderIteratorBlock;
+	/** @expose */
+	Runtime.G = Runtime.registerGlobalRenderer;
 	
 
 	// Break out of this closure, and show Closure Compiler that this file has a side-effect. 
