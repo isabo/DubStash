@@ -11,11 +11,11 @@ DubStash is a fast, lightweight and simple semantic template engine for HTML.
 ## tl;dr
 
 * `<script src="dubstash.min.js"></script>` [Details...](#deploying)
-* {{[placeholder](#basic-usage)}}, {{{don't-escape-this-triple-stashed-value}}}
-* {{<strong>[if](#conditions)</strong> something}} ... {{else}} ... {{end if}}
-* {{<strong>[foreach](#iterations)</strong> things}} ... {{end foreach}}
-* Different templates can make use of common building blocks known as [global templates](#global-templates).
-* [Recursive evaluation](#recursion): {{placeholder **/r**}} or even {{if something **/r**}}
+* {{[propertyName](#basic-usage)}} writes out HTML-escaped value; {{{propertyName}}} writes out value without HTML-escaping it.
+* {{<strong>[if](#conditions)</strong> propertyName}} *output this text* {{else}} *output this other text* {{end if}}
+* {{<strong>[foreach](#iterations)</strong> collectionPropertyName}} ... {{end foreach}}
+* [Global templates](#global-templates) can be used by other templates as building blocks.
+* [Recursive evaluation](#recursion): {{propertyName **/r**}} or even {{if propertyName **/r**}}
 * [Precompilation of templates to Javascript](#precompilation)
 
 ## Usage
@@ -213,12 +213,13 @@ The value of `output2` is:
 
 * The [global templates](#global-templates) example uses recursion: the value of the {{bestName}}
   placeholder is itself a template that is then evaluated. 
-* If the result of an expression may itself be a template that should be evaluated (but not a global
-  template), use the `/r` flag, e.g. ```{{blurb2 /r}}```
-* Recursive evaluation will not double-escape the HTML.
+* If you want to treat the value of an expression as a template itself, and evaluate it, use the /r flag,
+  e.g. ```{{blurb2 /r}}``` 
+  Note: You do not need the /r flag when using  global templates -- it is implied.
+* Don't worry, recursive evaluation will not double-escape the HTML.
 
 In the [global templates](#global-templates) example, the greeting template does not handle a case 
-where we don't know a person's first name or nickname. Let's improve it to handle such a case.
+where we don't know a person's first name or nickname. Let's build a template that makes up for that deficiency.
 
 ```js
 // 'bestName' is a template that writes out the best name to use for greeting a person:
