@@ -8,6 +8,7 @@
   },
   "scripts": {
     "test": "node_modules/.bin/tape test/**test.js | node_modules/.bin/faucet",
+    "build": "node build/build.js"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,7 @@
   },
   "homepage": "https://github.com/isabo/DubStash#README",
   "devDependencies": {
+    "closure-compiler": "git://github.com/isabo/node-closure.git#allow-newer-compiler",
     "faucet": "0.0.1",
     "tape": "^4.2.1"
   }
