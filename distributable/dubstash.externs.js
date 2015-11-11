@@ -53,7 +53,6 @@ var DubStash = {
 	 *
 	 * @param {string} name A unique name for the data.
 	 * @param {Object|string} data The data object or string.
-	 * @expose
 	 */
 	registerGlobalData: function(name, data){},
 
