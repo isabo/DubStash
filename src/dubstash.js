@@ -10,22 +10,22 @@
 	 * This is the public interface to the library.
 	 */
 	var DubStash = {
-	
+
 		'VERSION': '1.0.0.rc7',
 
 		/**
-		 * Get a function that, when called, writes out the template while performing the necessary 
+		 * Get a function that, when called, writes out the template while performing the necessary
 		 * substitutions.
 		 *
 		 * @param {string} text The template text.
 		 * @return {function(Object, boolean=, Object=):string}
 		 * Where the params of the returned function are:
-		 * 	{Object} data An object whose fields will be substituted into the placeholders, or  
+		 * 	{Object} data An object whose fields will be substituted into the placeholders, or
 		 *		tested by conditions.
-		 *	{boolean=} opt_ignoreUndefined Whether to leave alone placeholders whose value is  
+		 *	{boolean=} opt_ignoreUndefined Whether to leave alone placeholders whose value is
 		 *		undefined or to replace them with nothing (default: replace with nothing).
 		 *  {Context=} opt_startContext A context created by calling createContext. Specifies that
-		 *		all paths in the template should be considered relative to the current context 
+		 *		all paths in the template should be considered relative to the current context
 		 *		object, and not relative to the 'data' object.
 		 * @expose
 		 */
@@ -37,16 +37,16 @@
 
 
 		/**
-		 * Get the source of a function that when called writes out the template while performing  
-		 * the necessary substitutions. The source can then be saved and used instead of the 
+		 * Get the source of a function that when called writes out the template while performing
+		 * the necessary substitutions. The source can then be saved and used instead of the
 		 * template.
 		 *
 		 * @param {string} text The template text.
 		 * @return {string}
 		 * Where the params of the returned function are:
-		 * 	{Object} data An object whose fields will be substituted into the placeholders, or 
+		 * 	{Object} data An object whose fields will be substituted into the placeholders, or
 		 *		tested by conditions.
-		 *	{boolean=} opt_ignoreUndefined Whether to leave alone placeholders whose value is 
+		 *	{boolean=} opt_ignoreUndefined Whether to leave alone placeholders whose value is
 		 *		undefined or to replace them with nothing (default: replace with nothing).
 		 * @expose
 		 */
@@ -95,7 +95,7 @@
 			var lines = [''];
 			for (var name in this.globalTemplates_){
 				var compiler = new Compiler(this.globalTemplates_[name]);
-				lines.push('DubStash.R.G(\'' + name + '\', ' + compiler.getRendererSource() + ');');	
+				lines.push('DubStash.R.G(\'' + name + '\', ' + compiler.getRendererSource() + ');');
 			};
 			return lines.join('\n');
 		},
@@ -116,7 +116,7 @@
 
 
 		/**
-		 * Create a context for use when calling the rendering function that results from 
+		 * Create a context for use when calling the rendering function that results from
 		 * compiling a template.
 		 *
 		 * @param {Object} startObj The object that the paths in the template refer to.
@@ -159,7 +159,7 @@
 		/**
 		 * A stack of the hierarchy of blocks currently being analyzed. Once the end of a block is
 		 * reached, it is "closed".
-		 * 
+		 *
 		 * @type {Array.<Object>}
 		 * @private
 		 */
@@ -188,7 +188,7 @@
 	/**
 	 * Parses the template and returns a function that will render it.
 	 *
-	 * @return {function(Object, boolean=):string} Where the params are Object: run-time data object 
+	 * @return {function(Object, boolean=):string} Where the params are Object: run-time data object
 	 * whose fields will be substituted into the placeholders, or tested by conditions, and boolean:
 	 * whether to ignore placeholders whose value is undefined (default: don't ignore, i.e. replace
 	 * with nothing).
@@ -201,10 +201,10 @@
 		// Ask each block to generate a rendering function.
 		var renderers = this.getTopLevelRenderers_();
 
-		// Return a function that calls the block rendering functions and strings together the 
-		// results. Partially bind the runtime function to the rendering functions generated using 
+		// Return a function that calls the block rendering functions and strings together the
+		// results. Partially bind the runtime function to the rendering functions generated using
 		// design time configuration settings.
-		return /** @type {function(Object, boolean=, Context=):string}*/(function (data, 
+		return /** @type {function(Object, boolean=, Context=):string}*/(function (data,
 			opt_ignoreUndefined, startContext){
 
 			return Runtime.renderTemplate(renderers, data, opt_ignoreUndefined, startContext);
@@ -213,7 +213,7 @@
 
 
 	/**
-	 * Parses the template and returns the source code of a function that will render it. This can 
+	 * Parses the template and returns the source code of a function that will render it. This can
 	 * then be saved into a .js file -- i.e. precompilation.
 	 *
 	 * @return {string}
@@ -239,7 +239,7 @@
 
 	/**
 	 * Create an array of rendering functions generated by the top-level blocks.
-	 * 
+	 *
 	 * @return {!Array.<function(Object, boolean):string>}
 	 * @private
 	 */
@@ -256,7 +256,7 @@
 
 	/**
 	 * Create an array of sources of rendering functions generated by the top-level blocks.
-	 * 
+	 *
 	 * @return {!Array.<string>}
 	 * @private
 	 */
@@ -278,11 +278,11 @@
 	 */
 	Compiler.prototype.compile_ = function(){
 
-		// Reset our regexp just in case it was left in an unpredictable state by an incomplete 
+		// Reset our regexp just in case it was left in an unpredictable state by an incomplete
 		// parsing operation.
 		Compiler.PATTERN.lastIndex = 0;
 
-		// Loop through the occurrences of {{...}} 
+		// Loop through the occurrences of {{...}}
 		var match;
 		while ((match = Compiler.PATTERN.exec(this.text_)) !== null){
 
@@ -290,8 +290,8 @@
 				// The brackets are balanced.
 
 				var isRecursive, block, unexpected;
-				
-				// Anything between the last {{...}} (or the beginning) and this {{...}} is a text 
+
+				// Anything between the last {{...}} (or the beginning) and this {{...}} is a text
 				// block.
 				this.addTextBlock_(match);
 
@@ -324,10 +324,10 @@
 						};
 						break;
 
-					
+
 					case 'else':
 
-						// The last open block should be a condition. Tell it that an {{else}} has 
+						// The last open block should be a condition. Tell it that an {{else}} has
 						// been found.
 						unexpected = false;
 						if (this.openBlocks_.length){
@@ -347,9 +347,9 @@
 							// An else outside an if?!
 							// Put it back in the output to show the problem.
 							this.addTextBlock_(match[0]);
-							console.log('Unexpected {{else}} encountered!');	
+							console.log('Unexpected {{else}} encountered!');
 						};
-				
+
 						break;
 
 
@@ -362,9 +362,9 @@
 							// If the type of block that is supposed to be closing is specified,
 							// verify that it is closing the correct block.
 							if (match[3]){
-								
+
 								lastBlock = this.openBlocks_[this.openBlocks_.length - 1];
-								
+
 								if (match[3] === 'if'){
 									unexpected = !(lastBlock instanceof ConditionBlock);
 								} else if (match[3] === 'foreach'){
@@ -373,7 +373,7 @@
 									unexpected = true;
 								};
 							};
-							
+
 						} else {
 							unexpected = true;
 						};
@@ -395,7 +395,7 @@
 						var htmlEscape = (match[1].length === 2);
 						isRecursive = (match[3] === '/r');
 						block = new PlaceholderBlock(match[2], isRecursive, htmlEscape);
-						this.addBlock_(block);					
+						this.addBlock_(block);
 				};
 
 			} else {
@@ -428,14 +428,14 @@
 	 */
 	Compiler.prototype.addTextBlock_ = function(match){
 
-		var str = (typeof match === 'string') ? 
+		var str = (typeof match === 'string') ?
 			match : this.text_.slice(this.lastIndex_, match.index);
 
 		if (str.length){
 			var block = new TextBlock(str);
 			this.addBlock_(block);
 		} else {
-			this.lastIndex_ = Compiler.PATTERN.lastIndex;		
+			this.lastIndex_ = Compiler.PATTERN.lastIndex;
 		};
 	};
 
@@ -501,14 +501,14 @@
 
 
 	/**
-	 * Returns the source code for a function that when called will generate the run-time text of  
+	 * Returns the source code for a function that when called will generate the run-time text of
 	 * the block according to a supplied data object and options.
 	 *
-	 * @return {string} 
+	 * @return {string}
 	 */
 	TextBlock.prototype.getRendererSource = function(){
 
-		// Return a function with the value of this.text_ frozen into it, because serialized 
+		// Return a function with the value of this.text_ frozen into it, because serialized
 		// functions lose their scope variables.
 		return [
 			'function(){',
@@ -537,7 +537,7 @@
 
 
 	/**
-	 * Used by precompiler. Makes text safe for inclusion in precompiled JavaScript. That means 
+	 * Used by precompiler. Makes text safe for inclusion in precompiled JavaScript. That means
 	 * escaping any double quotes.
 	 *
 	 * @return {string}
@@ -557,7 +557,7 @@
 	 * Represents a placeholder to be replaced with data at runtime. Discovered by the compiler.
 	 *
 	 * @param {string} name The name of the field to look up at runtime.
-	 * @param {boolean} isRecursive Whether to treat the resulting value as a template and process 
+	 * @param {boolean} isRecursive Whether to treat the resulting value as a template and process
 	 *		that.
 	 * @param {boolean} htmlEscape Whether to escape the runtime value to make it safe for inclusion
 	 * 		in HTML.
@@ -567,7 +567,7 @@
 
 		/**
 		 * Name of property to evaluate.
-		 * 
+		 *
 		 * @type {string}
 		 * @private
 		 */
@@ -605,28 +605,28 @@
 		var self = this;
 		return /** @type {function(Context, boolean=):string} */(function(context, ignoreUndefined){
 
-			return Runtime.renderPlaceHolderBlock(self.name_, self.isRecursive_, self.htmlEscape_, 
+			return Runtime.renderPlaceHolderBlock(self.name_, self.isRecursive_, self.htmlEscape_,
 				context, ignoreUndefined);
 		});
 	};
 
 
 	/**
-	 * Returns the source code for a function that when called will generate the run-time text of 
+	 * Returns the source code for a function that when called will generate the run-time text of
 	 * the block according to a supplied data object and options.
 	 *
-	 * @return {string} 
+	 * @return {string}
 	 */
 	PlaceholderBlock.prototype.getRendererSource = function(){
 
 		// We would like to partially bind the runtime block renderer function with design-time
-		// params, but because we will serialize the function to text, it will lose its scope 
+		// params, but because we will serialize the function to text, it will lose its scope
 		// variables - i.e. the binding will be worthless. We therefore have to freeze the values of
 		// the design-time variables into the function.
 		return [
 			'function(c, i){',
 			'	return DubStash.R.P(' +
-					['"' + this.name_ + '"', this.isRecursive_, this.htmlEscape_].join(', ') + 
+					['"' + this.name_ + '"', this.isRecursive_, this.htmlEscape_].join(', ') +
 					', c, i);',
 
 			'}'
@@ -640,7 +640,7 @@
 	 * Represents a condition block to be evaluated at runtime.
 	 *
 	 * @param {string} name The name of the field to evaluate up at runtime.
-	 * @param {boolean} isRecursive Whether to treat the resulting value as a template and evaluate 
+	 * @param {boolean} isRecursive Whether to treat the resulting value as a template and evaluate
 	 *		that.
 	 * @constructor
 	 */
@@ -680,7 +680,7 @@
 		 * @private
 		 */
 		this.trueBlocks_ = [];
-		
+
 
 		/**
 		 * Series of blocks that apply when the property is falsy.
@@ -693,7 +693,7 @@
 
 
 	/**
-	 * Tell the block that its {{else}} has been encountered. Any subsequent blocks encountered 
+	 * Tell the block that its {{else}} has been encountered. Any subsequent blocks encountered
 	 * will be 'false' blocks -- blocks to use if the condition evaluates to false.
 	 */
 	ConditionBlock.prototype.foundElse = function(){
@@ -702,14 +702,14 @@
 	};
 
 
-	/** 
+	/**
 	 * Adds a subordinate block.
 	 *
 	 * @param {Object} block
 	 */
 	ConditionBlock.prototype.addBlock = function(block){
 
-		var blocks = this.foundElse_ ? this.falseBlocks_ : this.trueBlocks_; 
+		var blocks = this.foundElse_ ? this.falseBlocks_ : this.trueBlocks_;
 		blocks.push(block);
 	};
 
@@ -730,17 +730,17 @@
 
 		return /** @type {function(Context, boolean=):string} */(function(context, ignoreUndefined){
 
-			return Runtime.renderConditionBlock(name, isRecursive, trueRenderers, falseRenderers, 
+			return Runtime.renderConditionBlock(name, isRecursive, trueRenderers, falseRenderers,
 				context, ignoreUndefined);
 		});
 	};
 
 
 	/**
-	 * Returns the source code for a function that when called will generate the run-time text of 
+	 * Returns the source code for a function that when called will generate the run-time text of
 	 * the block according to a supplied data object and options.
 	 *
-	 * @return {string} 
+	 * @return {string}
 	 */
 	ConditionBlock.prototype.getRendererSource = function(){
 
@@ -758,9 +758,9 @@
 
 	/**
 	 * Get an array of rendering functions for trueBlocks or falseBlocks.
-	 * 
+	 *
 	 * @param {!Array.<Object>} blocks Either trueBlocks or falseBlocks.
-	 * @return {!Array.<function(Context, boolean=):string>} Array of rendering functions to call at 
+	 * @return {!Array.<function(Context, boolean=):string>} Array of rendering functions to call at
 	 *		runtime.
 	 * @private
 	 */
@@ -777,7 +777,7 @@
 
 	/**
 	 * Get an array of the sources of rendering functions for trueBlocks or falseBlocks.
-	 * 
+	 *
 	 * @param {!Array.<Object>} blocks Either trueBlocks or falseBlocks.
 	 * @return {!Array.<string>} Array of sources of rendering functions to call at runtime.
 	 * @private
@@ -841,10 +841,10 @@
 
 
 	/**
-	 * Returns the source code for a function that when called will generate the run-time text of  
+	 * Returns the source code for a function that when called will generate the run-time text of
 	 * the block according to a supplied data object and options.
 	 *
-	 * @return {string} 
+	 * @return {string}
 	 */
 	IteratorBlock.prototype.getRendererSource = function(){
 
@@ -857,8 +857,8 @@
 		].join('\n');
 	};
 
-	
-	/** 
+
+	/**
 	 * Adds a subordinate block during parsing.
 	 *
 	 * @param {Object} block
@@ -871,7 +871,7 @@
 
 	/**
 	 * Get an array of rendering functions for the iterable blocks.
-	 * 
+	 *
 	 * @return {!Array.<function(Context, boolean=):string>} Array of rendering functions to call at
 	 *		runtime.
 	 * @private
@@ -889,7 +889,7 @@
 
 	/**
 	 * Get an array of the sources of rendering functions for the iterable blocks.
-	 * 
+	 *
 	 * @return {!Array.<string>} Array of sources of rendering functions to call at runtime.
 	 * @private
 	 */
@@ -906,13 +906,13 @@
 
 
 
-	/** 
+	/**
 	 * Allows the runtime to keep track of which is the current object in the hierarchy, when
 	 * when drilling down through multi.level.objects.
-	 * 
-	 * @param {Object} currentObj 
+	 *
+	 * @param {Object} currentObj
 	 * @param {string} currentPath The path to the current object from the root object.
-	 * @param {Object} rootObj The root object. Must contain currentObj somewhere in its 
+	 * @param {Object} rootObj The root object. Must contain currentObj somewhere in its
 	 *		hierarchy.
 	 * @constructor
 	 */
@@ -965,14 +965,14 @@
 		globalData_: {},
 
 
-		/** 
+		/**
 		 * Renders a compiled template (supplied in the form of a series of renderer functions
 		 * that were curried into the calling function).
 		 *
 		 * @param {Array.<function(Context, boolean=):string>} renderers
 		 * @param {Object} data
 		 * @param {boolean=} opt_ignoreUndefined
-		 * @param {Context=} opt_startContext Context to start with. This is necessary when 
+		 * @param {Context=} opt_startContext Context to start with. This is necessary when
 		 *		rendering a recursive template inside an iteration. For internal use only.
 		 * @return {string}
 		 */
@@ -994,8 +994,8 @@
 		 *
 		 * @param {string} name
 		 * @param {boolean} isRecursive
-		 * @param {boolean} htmlEscape 
-		 * @param {Context} context 
+		 * @param {boolean} htmlEscape
+		 * @param {Context} context
 		 * @param {boolean=} ignoreUndefined
 		 * @return {string}
 		 */
@@ -1004,7 +1004,7 @@
 			var value = Runtime.getValue_(name, context);
 
 			if (ignoreUndefined && value === undefined){
-				
+
 				// Leave the placeholder unchanged, i.e. reconstruct it.
 				return htmlEscape ? '{{' + name + '}}' : '{{{' + name + '}}}';
 
@@ -1036,7 +1036,7 @@
 		 * @param {boolean} isRecursive
 		 * @param {Array.<function(Context, boolean=):string>} trueRenderers
 		 * @param {Array.<function(Context, boolean=):string>} falseRenderers
- 		 * @param {Context} context 
+ 		 * @param {Context} context
 		 * @param {boolean=} ignoreUndefined
 		 * @return {string}
 		 */
@@ -1044,8 +1044,8 @@
 
 			// Get the value, recursively if necessary.
 			var value = Runtime.getValue_(name, context);
-			// Recurse only if the value starts with {{ (and strictly speaking, ends with }}). 
-			// Otherwise, there is something apart from template directives, i.e. it will 
+			// Recurse only if the value starts with {{ (and strictly speaking, ends with }}).
+			// Otherwise, there is something apart from template directives, i.e. it will
 			// evaluate to truthy anyway.
 			if (value && isRecursive && value.slice(0,2) === '{{' && value.slice(-2) === '}}'){
 				var render = this.compileRecursive_(value);
@@ -1055,7 +1055,7 @@
 			// Decide which set of renderers to use.
 			var renderers = value ? trueRenderers : falseRenderers;
 
-			// Call the appropriate set of rendering functions in turn, and string the results 
+			// Call the appropriate set of rendering functions in turn, and string the results
 			// together.
 			var output = [];
 			for (var i in renderers){
@@ -1085,10 +1085,10 @@
 			// Iterate through the collection, writing out our sub-blocks for each item.
 			if (collection){
 
-				// The individual items we will now render need their own context. 
+				// The individual items we will now render need their own context.
 				// Build the path of the member. 'name' refers to the collection. Use a made-up
 				// name to refer to the item retrieved from the collection.
-				var memberPath = context.currentPath.length ? 
+				var memberPath = context.currentPath.length ?
 					context.currentPath + '.' + name : name;
 				memberPath += '.[item]';
 
@@ -1108,7 +1108,7 @@
 
 
 		/**
-		 * Compile the results of a recursive placeholder that was just evaluated. Cache the 
+		 * Compile the results of a recursive placeholder that was just evaluated. Cache the
 		 * rendering function for reuse. Caching is especially useful for iterations where each
 		 * item has a recursive placeholder.
 		 *
@@ -1158,14 +1158,14 @@
 			// Cycle through all except the last segment.
 
 			// First: clone the context, because don't want to change the original.
-			var drilledContext = new Context(context.currentObj, context.currentPath, 
+			var drilledContext = new Context(context.currentObj, context.currentPath,
 				context.rootObj);
 			var segments = name.split('.');
-			var lastSegmentIndex = segments.length - 1; 
+			var lastSegmentIndex = segments.length - 1;
 			for (var i = 0; i < lastSegmentIndex; i++){
 				var nextObj = this.evaluate_(drilledContext, segments[i]);
 				if (nextObj !== undefined){
-					var nextPath = drilledContext.currentPath ? 
+					var nextPath = drilledContext.currentPath ?
 						[drilledContext.currentPath, segments[i]].join('.') : segments[i];
 					drilledContext.currentObj = nextObj;
 					drilledContext.currentPath = nextPath;
@@ -1180,9 +1180,9 @@
 				};
 			};
 
-			// Our context now points to an object which we hope has a property accessible using 
+			// Our context now points to an object which we hope has a property accessible using
 			// the last segment.
-			var value = this.evaluate_(drilledContext, segments[lastSegmentIndex]); 
+			var value = this.evaluate_(drilledContext, segments[lastSegmentIndex]);
 
 			if (context !== this.globalContext_ && !climbed && value === undefined){
 				// Couldn't get a value using the local data context. Try using the global context.
@@ -1193,7 +1193,7 @@
 		},
 
 
-		/** 
+		/**
 		 * Evaluates an object property. Empty arrays and objects are falsy.
 		 *
 		 * @param {Context} context A context object, where currentObj contains the property we want.
@@ -1205,7 +1205,7 @@
 
 			var obj = context.currentObj;
 			var value;
-			
+
 			if (obj === null){
 				// The object could have been an empty {} or [] that we converted to null. Either
 				// way, it does not have the desired property.
@@ -1215,7 +1215,7 @@
 
 				if (typeof obj[property] === 'function'){
 					// Call it.
-					value = obj[property](); 
+					value = obj[property]();
 
 				} else {
 					value = obj[property];
@@ -1226,7 +1226,7 @@
 				var renderer = this.globalRenderers_[property];
 				if (renderer){
 					value = renderer.call(null, context.rootObj, undefined, context);
-				};				
+				};
 			};
 
 			// If the value is an empty array or an object with no values, return null. This
@@ -1245,19 +1245,19 @@
 					return null;
 				};
 			} else {
-				
+
 				return value;
 			};
 		},
 
 
 		/**
-		 * If the desired property name begins with '../', climb the levels of ../ and return 
+		 * If the desired property name begins with '../', climb the levels of ../ and return
 		 * the corresponding context.
 		 *
 		 * @param {string} name
 		 * @param {Context} context
-		 */ 
+		 */
 		getAncestorContext_: function(name, context){
 
 			// Find how many levels to climb.
@@ -1267,29 +1267,29 @@
 
 				// name refers to an object one or more level(s) above the supplied context.
 
-				// Chop the last X segments off currentPath to get the path of the object that 
+				// Chop the last X segments off currentPath to get the path of the object that
 				// 'name' is relative to, which is the ancestor we want. Note that the root object
 				// has a path of '', so the currentPath does not show it.
 				var currentPathSegments = (context.currentPath).split('.');
 				var lastDesiredSegmentIndex = currentPathSegments.length - levels - 1;
 				if (lastDesiredSegmentIndex < -1 /* i.e. higher than the root object */){
-					console.log('Too many levels to climb from ' + context.currentPath + ' to ' + 
+					console.log('Too many levels to climb from ' + context.currentPath + ' to ' +
 						name + '. Will stop at the top.');
 					lastDesiredSegmentIndex = -1;
 				};
 
-				if (lastDesiredSegmentIndex !== -1){					
-					// Get the absolute path of the reference object. 
+				if (lastDesiredSegmentIndex !== -1){
+					// Get the absolute path of the reference object.
 					var ancestorPath = currentPathSegments.slice(0, lastDesiredSegmentIndex + 1).join('.');
 
 					// Get the object at that path. We need to use the root object's context for that.
 					var rootContext = new Context(context.rootObj, '', context.rootObj);
-					var ancestorObj = this.getValue_(ancestorPath, rootContext); 
+					var ancestorObj = this.getValue_(ancestorPath, rootContext);
 
 				} else {
 					// It's the root object.
 					ancestorPath = '';
-					ancestorObj = context.rootObj;	
+					ancestorObj = context.rootObj;
 				};
 
 				// Now build the context to return.
@@ -1301,7 +1301,7 @@
 				return ancestorContext;
 
 			} else {
-				
+
 				return context;
 			};
 		},
@@ -1321,9 +1321,9 @@
 				collection.forEach(callback);
 
 			} else if (typeof collection.__iterator__ === 'function'){
-				
+
 				// It has a Javascript 1.7 style iterator function. We might not actually be on 1.7,
-				// so we cannot just say 'for value in collection'. We'll use the iterator 
+				// so we cannot just say 'for value in collection'. We'll use the iterator
 				// explicitly.
 				var iterator = collection.__iterator__(false);
 				var stopped = false;
@@ -1331,7 +1331,7 @@
 					try {
 						var obj = iterator.next();
 					} catch (ex){
-						// Assume this is StopIterator. Since Node doesnt support this yet, it 
+						// Assume this is StopIterator. Since Node doesnt support this yet, it
 						// is difficult to write a script that would get us the global StopIterator
 						// error to compare with.
 						stopped = true;
@@ -1402,7 +1402,7 @@
 
 	// Make Runtime available externally under a predictable and very short name (Closure renames it
 	// internally, to an unpredictable value).
-	// Ditto for the methods that are called from precompiled code. 
+	// Ditto for the methods that are called from precompiled code.
 	/** @expose */
 	DubStash.R = Runtime;
 	/** @expose */
@@ -1410,19 +1410,19 @@
 	/** @expose */
 	Runtime.P = Runtime.renderPlaceHolderBlock;
 	/** @expose */
-	Runtime.C = Runtime.renderConditionBlock;		
+	Runtime.C = Runtime.renderConditionBlock;
 	/** @expose */
 	Runtime.I = Runtime.renderIteratorBlock;
 	/** @expose */
 	Runtime.G = Runtime.registerGlobalRenderer;
-	
 
-	// Break out of this closure, and show Closure Compiler that this file has a side-effect. 
+
+	// Break out of this closure, and show Closure Compiler that this file has a side-effect.
 	// 'this' is the global object, i.e. 'window' in browsers.
 	this['DubStash'] = DubStash;
-	
 
-	// Make available in Node. 
+
+	// Make available in Node.
 	try{
 		module.exports = DubStash;
 	} catch (ex){};

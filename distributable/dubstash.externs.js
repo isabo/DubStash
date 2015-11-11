@@ -1,14 +1,14 @@
 /*
-	This file contains 'Extern' definitions that describe DubStash's interface for Google Closure 
+	This file contains 'Extern' definitions that describe DubStash's interface for Google Closure
 	Compiler.
-	
-	You don't need this unless you want to compile your project with Google Closure Compiler.  
+
+	You don't need this unless you want to compile your project with Google Closure Compiler.
 */
 
 var DubStash = {
 
 	/**
-	 * Get a function that, when called, writes out the template while performing the necessary 
+	 * Get a function that, when called, writes out the template while performing the necessary
 	 * substitutions.
 	 *
 	 * @param {string} text
@@ -18,8 +18,8 @@ var DubStash = {
 
 
 	/**
-	 * Get the source of a function that, when called, writes out the template while performing  
-	 * the necessary substitutions. The source can then be saved and used instead of the 
+	 * Get the source of a function that, when called, writes out the template while performing
+	 * the necessary substitutions. The source can then be saved and used instead of the
 	 * template.
 	 *
 	 * @param {string} text The template text.
@@ -58,7 +58,7 @@ var DubStash = {
 
 
 	/**
-	 * Create a context for use when calling the rendering function that results from 
+	 * Create a context for use when calling the rendering function that results from
 	 * compiling a template.
 	 *
 	 * @param {Object} startObj The object that the paths in the template refer to.
@@ -71,7 +71,7 @@ var DubStash = {
 
 	R: {
 
-		/** 
+		/**
 		 * @param {Array.<function(Object, boolean=):string>} renderers
 		 * @param {Object} data
 		 * @param {boolean=} opt_ignoreUndefined
@@ -83,7 +83,7 @@ var DubStash = {
 		/**
 		 * @param {string} name
 		 * @param {boolean} isRecursive
-		 * @param {boolean} htmlEscape 
+		 * @param {boolean} htmlEscape
 		 * @param {Object} data
 		 * @param {boolean=} ignoreUndefined
 		 * @return {string}
