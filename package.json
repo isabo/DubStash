@@ -1,0 +1,31 @@
+{
+  "name": "dubstash",
+  "version": "1.0.0",
+  "description": "Fast, lightweight semantic template engine for HTML.",
+  "main": "distributable/dubstash.min.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node_modules/.bin/tape test/**test.js | node_modules/.bin/faucet",
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/isabo/DubStash.git"
+  },
+  "keywords": [
+    "template",
+    "semantic",
+    "html"
+  ],
+  "author": "Itzy Sabo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/isabo/DubStash/issues"
+  },
+  "homepage": "https://github.com/isabo/DubStash#README",
+  "devDependencies": {
+    "faucet": "0.0.1",
+    "tape": "^4.2.1"
+  }
+}
