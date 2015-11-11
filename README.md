@@ -301,8 +301,10 @@ Your HTML file needs to use the DubStash script. Use the distributable version
 DubStash is compiled and minified using Google Closure Compiler. The following command line does it:
 
 ```
-java -jar /path/to/compiler.jar --js src/dubstash.js --externs src/externs.js 
-	--output_wrapper="(function(){%output%})();" --js_output_file=distributable/dubstash.min.js 
-	--compilation_level=ADVANCED_OPTIMIZATIONS --warning_level=VERBOSE --jscomp_warning=checkTypes 
-	
+npm run build
+```
+
+## Testing
+```
+npm test
 ```
