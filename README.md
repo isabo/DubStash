@@ -36,27 +36,27 @@ DubStash is a fast, lightweight and simple semantic template engine for HTML.
 // HTML5 <template> tag, or put your templates inside <script type="text/dubstash">...</script>,
 // and assign the contents to a Javascript variable using the script tag's innerHTML property.
 var template = '<ul><li>My name is {{name}}.</li>' +
-			   '<li>I live in {{address.city}}.</li>' +
-			   '<li>My favourite cartoon is {{cartoon}}.</li></ul>';
+               '<li>I live in {{address.city}}.</li>' +
+               '<li>My favourite cartoon is {{cartoon}}.</li></ul>';
 
 // Generate a rendering function that can be used multiple times with different data.
 var render = DubStash.compile(template);
 
 // Define some example data objects.
 var person1 = {
-	name: 'John Smith',
-	address: {
-		city: 'Cardiff'
-	},
-	cartoon: 'Calvin & Hobbes'
+    name: 'John Smith',
+    address: {
+        city: 'Cardiff'
+    },
+    cartoon: 'Calvin & Hobbes'
 };
 
 var person2 = {
-	name: 'Fred Bloggs',
-	address: {
-		city: 'Swansea'
-	},
-	cartoon: 'Tom & Jerry'
+    name: 'Fred Bloggs',
+    address: {
+        city: 'Swansea'
+    },
+    cartoon: 'Tom & Jerry'
 };
 
 // Render the template with different data.
@@ -67,9 +67,9 @@ var output2 = render(person2);
 The value of `output1` is:
 ```html
 <ul>
-	<li>My name is John Smith.</li>
-	<li>I live in Cardiff.</li>
-	<li>My favourite cartoon is Calvin &amp; Hobbes.</li>
+    <li>My name is John Smith.</li>
+    <li>I live in Cardiff.</li>
+    <li>My favourite cartoon is Calvin &amp; Hobbes.</li>
 </ul>
 
 <!-- Linebreaks and indents added for clarity -->
@@ -78,9 +78,9 @@ The value of `output1` is:
 The value of `output2` is:
 ```html
 <ul>
-	<li>My name is Fred Bloggs.</li>
-	<li>I live in Swansea.</li>
-	<li>My favourite cartoon is Tom &amp; Jerry.</li>
+    <li>My name is Fred Bloggs.</li>
+    <li>I live in Swansea.</li>
+    <li>My favourite cartoon is Tom &amp; Jerry.</li>
 </ul>
 
 <!-- Linebreaks and indents added for clarity -->
@@ -99,16 +99,16 @@ The value of `output2` is:
 
 ```js
 var template = '<p>These are the people that {{name}} invited:</p>' +
-			   '<ul>{{foreach invitees}}<li>{{name}} (invited by {{../../name}})</li>{{end foreach}}</ul>';
+               '<ul>{{foreach invitees}}<li>{{name}} (invited by {{../../name}})</li>{{end foreach}}</ul>';
 var render = DubStash.compile(template);
 
 var person = {
-	name: 'John Smith',
-	invitees: [
-		{name: 'Fred Bloggs'},
-		{name: 'Jack Jackson'},
-		{name: 'Mary Black'}
-	]
+    name: 'John Smith',
+    invitees: [
+        {name: 'Fred Bloggs'},
+        {name: 'Jack Jackson'},
+        {name: 'Mary Black'}
+    ]
 };
 
 var output = render(person);
@@ -118,9 +118,9 @@ The value of `output` is:
 ```html
 <p>These are the people that John Smith invited:</p>
 <ul>
-	<li>Fred Bloggs (invited by John Smith)</li>
-	<li>Jack Jackson (invited by John Smith)</li>
-	<li>Mary Black (invited by John Smith)</li>
+    <li>Fred Bloggs (invited by John Smith)</li>
+    <li>Jack Jackson (invited by John Smith)</li>
+    <li>Mary Black (invited by John Smith)</li>
 </ul>
 
 <!-- Linebreaks and indents added for clarity -->
@@ -134,26 +134,26 @@ The value of `output` is:
 
 ```js
 var template = '<p>Dear {{if isMale}}Sir{{else}}Madam{{endif}},</p>' +
-			   '{{if itemsOrdered}}'
-			   '<p>These are the items you ordered:</p>' +
-			   '<ul>' +
-					'{{foreach itemsOrdered}}<li>{{name}}</li>{{end foreach}}' +
-			   '</ul>' +
-			   '{{else}}' +
-			   '<p>You have not ordered anything recently.</p>' +
-			   '{{end if}}';
+               '{{if itemsOrdered}}'
+               '<p>These are the items you ordered:</p>' +
+               '<ul>' +
+                    '{{foreach itemsOrdered}}<li>{{name}}</li>{{end foreach}}' +
+               '</ul>' +
+               '{{else}}' +
+               '<p>You have not ordered anything recently.</p>' +
+               '{{end if}}';
 var render = DubStash.compile(template);
 
 var recipient = {
-	gender: 'f',
-	isMale: function(){
-		return recipient.gender === 'm';
-	},
-	itemsOrdered: [
-		{name: 'Grand Piano'},
-		{name: 'Violin'},
-		{name: 'Flute'}
-	]
+    gender: 'f',
+    isMale: function(){
+        return recipient.gender === 'm';
+    },
+    itemsOrdered: [
+        {name: 'Grand Piano'},
+        {name: 'Violin'},
+        {name: 'Flute'}
+    ]
 };
 
 var output = render(recipient);
@@ -164,9 +164,9 @@ The value of `output` is:
 <p>Dear Madam,</p>
 <p>These are the items you ordered:</p>
 <ul>
-	<li>Grand Piano</li>
-	<li>Violin</li>
-	<li>Flute</li>
+    <li>Grand Piano</li>
+    <li>Violin</li>
+    <li>Flute</li>
 </ul>
 
 <!-- Linebreaks and indents added for clarity -->
@@ -181,20 +181,20 @@ The value of `output` is:
 ```js
 // 'bestName' is a template that writes out the best name to use for greeting a person:
 DubStash.registerGlobalTemplate('bestName',
-	'{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
+    '{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
 
 // Define the text of a generic letter.
 var renderLetter = DubStash.compile('<p>Dear {{bestName}},</p>');
 
 var person1 = {
-	firstName: 'William',
-	lastName: 'Smith',
-	nickName: 'Bill'
+    firstName: 'William',
+    lastName: 'Smith',
+    nickName: 'Bill'
 };
 
 var person2 = {
-	firstName: 'Frederick',
-	lastName: 'Bloggs'
+    firstName: 'Frederick',
+    lastName: 'Bloggs'
 };
 
 var output1 = renderLetter(person1);
@@ -227,14 +227,14 @@ deficiency.
 ```js
 // 'bestName' is a template that writes out the best name to use for greeting a person:
 DubStash.registerGlobalTemplate('bestName',
-	'{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
+    '{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
 
 // Define the text of a generic letter. If we don't know a person's name, say 'Sir'.
 var renderLetter = DubStash.compile(
-	'<p>Dear {{if bestName}}{{bestName}}{{else}}Sir{{end if}},</p>');
+    '<p>Dear {{if bestName}}{{bestName}}{{else}}Sir{{end if}},</p>');
 
 var person3 = {
-	lastName: 'Heisenberg'
+    lastName: 'Heisenberg'
 };
 
 var output3 = renderLetter(person3);
@@ -260,7 +260,7 @@ var DubStash = require('./dubstash.js');
 
 // 'bestName' is a template that writes out the best name to use for greeting a person:
 DubStash.registerGlobalTemplate('bestName',
-	'{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
+    '{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
 var globalsSource = DubStash.precompileGlobalTemplates();
 
 var template = 'My name is {{bestName}}.';
@@ -285,14 +285,14 @@ Your HTML file needs to use the DubStash script. Use the distributable version
 
 ```html
 <html>
-	<head>
-		...
-		<script src="dubstash.min.js"></script>
-		...
-	</head>
-	<body>
-		...
-	</body>
+    <head>
+        ...
+        <script src="dubstash.min.js"></script>
+        ...
+    </head>
+    <body>
+        ...
+    </body>
 </html>
 ```
 
