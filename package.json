@@ -28,6 +28,7 @@
   "devDependencies": {
     "closure-compiler": "git://github.com/isabo/node-closure.git#allow-newer-compiler",
     "faucet": "0.0.1",
+    "google-closure-library": "^20151015.0.0",
     "tape": "^4.2.1"
   }
 }

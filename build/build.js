@@ -1,10 +1,9 @@
 var compiler = require('closure-compiler');
-// var fs = require('fs');
 
 var options = {
-        js: 'src/dubstash.js',
-        externs: 'src/externs.js',
-        // output_wrapper: '(function(){%output%})();',
+        js: ['src/**.js', '!src/externs/**', 'node_modules/google-closure-library/closure/goog/base.js'],
+        externs: 'src/externs/externs.js',
+        output_wrapper_file: 'build/wrapper.js',
         js_output_file: 'distributable/dubstash.min.js',
         compilation_level: 'ADVANCED',
         warning_level: 'VERBOSE',

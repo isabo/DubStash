@@ -1,9 +1,9 @@
-/*
-	This file contains 'Extern' definitions that describe DubStash's interface for Google Closure
-	Compiler.
-
-	You don't need this unless you want to compile your project with Google Closure Compiler.
-*/
+/**
+ * @fileoverview This file contains 'Extern' definitions that describe DubStash's interface for
+ * Google Closure Compiler.
+ *
+ * You don't need this unless you want to compile your project with Google Closure Compiler.
+ */
 
 var DubStash = {
 
@@ -12,7 +12,7 @@ var DubStash = {
 	 * substitutions.
 	 *
 	 * @param {string} text
-	 * @return {DubStash.Renderer}
+	 * @return {DubStash.ExternalRenderingFunction}
 	 */
 	compile: function(text){},
 
@@ -66,58 +66,63 @@ var DubStash = {
 	 * @param {Object} rootObj The root object. Must contain startObj somewhere in its hierarchy.
 	 * @return {Object}
 	 */
-	'createContext': function(startObj, startPath, rootObj){},
+	createContext: function(startObj, startPath, rootObj){},
 
 
-	R: {
+	/**
+	 * @param {Array.<DubStash.ContextualRenderingFunction>} renderers
+	 * @param {Object} data
+	 * @param {boolean=} opt_ignoreUndefined
+	 * @param {Object=} opt_startContext
+	 * @return {string}
+	 */
+	T: function(renderers, data, opt_ignoreUndefined, opt_startContext){},
 
-		/**
-		 * @param {Array.<function(Object, boolean=):string>} renderers
-		 * @param {Object} data
-		 * @param {boolean=} opt_ignoreUndefined
-		 * @param {Object=} opt_startContext
-		 * @return {string}
-		 */
-		T: function(renderers, data, opt_ignoreUndefined, opt_startContext){},
+	/**
+	 * @param {string} name
+	 * @param {boolean} isRecursive
+	 * @param {boolean} htmlEscape
+	 * @param {Object} data
+	 * @param {boolean=} ignoreUndefined
+	 * @return {string}
+	 */
+	P: function(name, isRecursive, htmlEscape, data, ignoreUndefined){},
 
-		/**
-		 * @param {string} name
-		 * @param {boolean} isRecursive
-		 * @param {boolean} htmlEscape
-		 * @param {Object} data
-		 * @param {boolean=} ignoreUndefined
-		 * @return {string}
-		 */
-		P: function(name, isRecursive, htmlEscape, data, ignoreUndefined){},
+	/**
+	 * @param {string} name
+	 * @param {boolean} isRecursive
+	 * @param {Array.<DubStash.ContextualRenderingFunction>} trueRenderers
+	 * @param {Array.<DubStash.ContextualRenderingFunction>} falseRenderers
+	 * @param {Object} data
+	 * @param {boolean=} ignoreUndefined
+	 * @return {string}
+	 */
+	C: function(name, isRecursive, trueRenderers, falseRenderers, data, ignoreUndefined){},
 
-		/**
-		 * @param {string} name
-		 * @param {boolean} isRecursive
-		 * @param {Array.<function(Object, boolean=):string>} trueRenderers
-		 * @param {Array.<function(Object, boolean=):string>} falseRenderers
-		 * @param {Object} data
-		 * @param {boolean=} ignoreUndefined
-		 * @return {string}
-		 */
-		C: function(name, isRecursive, trueRenderers, falseRenderers, data, ignoreUndefined){},
+	/**
+	 * @param {string} name
+	 * @param {Array.<DubStash.ContextualRenderingFunction>} subRenderers
+	 * @param {Object} data
+	 * @param {boolean=} ignoreUndefined
+	 * @return {string}
+	 */
+	I: function(name, subRenderers, data, ignoreUndefined){},
 
-		/**
-		 * @param {string} name
-		 * @param {Array.<function(Object, boolean=):string>} subRenderers
-		 * @param {Object} data
-		 * @param {boolean=} ignoreUndefined
-		 * @return {string}
-		 */
-		I: function(name, subRenderers, data, ignoreUndefined){},
-
-		/**
-		 * @param {string} name A unique name for the template.
-		 * @param {function(Object, boolean=, Object=):string} renderer A rendering function.
-		 */
-		G: function(name, renderer){}
-	}
+	/**
+	 * @param {string} name A unique name for the template.
+	 * @param {DubStash.ExternalRenderingFunction} renderer A rendering function.
+	 */
+	G: function(name, renderer){}
 };
 
 
-/** @typedef {function(Object, boolean=, Object=)} */
-DubStash.Renderer;
+/**
+ * @typedef {function(Object, boolean=, Object=):string}
+ */
+DubStash.ExternalRenderingFunction;
+
+
+/**
+ * @typedef {function(Object, boolean=):string}
+ */
+DubStash.ContextualRenderingFunction;
