@@ -8,6 +8,7 @@ goog.require('DubStash.Runtime');
  *
  * @param {string} name The name of the collection field to iterate on at runtime.
  * @constructor
+ * @implements {DubStash.compiler.Block}
  */
 DubStash.compiler.IteratorBlock = function(name){
 
@@ -69,7 +70,7 @@ DubStash.compiler.IteratorBlock.prototype.getRendererSource = function(){
 /**
  * Adds a subordinate block during parsing.
  *
- * @param {Object} block
+ * @param {DubStash.compiler.Block} block
  */
 DubStash.compiler.IteratorBlock.prototype.addBlock = function(block){
 

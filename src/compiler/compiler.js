@@ -33,7 +33,7 @@ DubStash.Compiler = function(text){
      * A stack of the hierarchy of blocks currently being analyzed. Once the end of a block is
      * reached, it is "closed".
      *
-     * @type {Array<Object>}
+     * @type {Array<DubStash.compiler.Block>}
      * @private
      */
     this.openBlocks_ = [];
@@ -51,7 +51,7 @@ DubStash.Compiler = function(text){
     /**
      * The series of blocks that make up the template.
      *
-     * @type {Array<Object>}
+     * @type {Array<DubStash.compiler.Block>}
      * @private
      */
     this.topLevelBlocks_ = [];
@@ -320,7 +320,7 @@ DubStash.Compiler.prototype.addTextBlock_ = function(match){
 /**
  * Adds a new block to the tree.
  *
- * @param {Object} block
+ * @param {DubStash.compiler.Block} block
  * @private
  */
 DubStash.Compiler.prototype.addBlock_ = function(block){

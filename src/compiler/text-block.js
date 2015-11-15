@@ -6,6 +6,7 @@ goog.provide('DubStash.compiler.TextBlock');
  *
  * @param {string} text The static text.
  * @constructor
+ * @implements {DubStash.compiler.Block}
  */
 DubStash.compiler.TextBlock = function(text){
 
@@ -81,3 +82,11 @@ DubStash.compiler.TextBlock.prototype.escapedText = function(){
                       replace(DubStash.compiler.TextBlock.RE_DOUBLE_QUOTES, '\\"').
                       replace(DubStash.compiler.TextBlock.RE_NEWLINE, '\\n');
 };
+
+
+/**
+ * For compatibility with the Block interface.
+ *
+ * @param {DubStash.compiler.Block} block
+ */
+DubStash.compiler.TextBlock.prototype.addBlock = function(block){};

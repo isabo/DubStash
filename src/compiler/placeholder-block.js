@@ -12,6 +12,7 @@ goog.require('DubStash.Runtime');
  * @param {boolean} htmlEscape Whether to escape the runtime value to make it safe for inclusion
  *         in HTML.
  * @constructor
+ * @implements {DubStash.compiler.Block}
  */
 DubStash.compiler.PlaceholderBlock = function(name, isRecursive, htmlEscape){
 
@@ -81,3 +82,11 @@ DubStash.compiler.PlaceholderBlock.prototype.getRendererSource = function(){
         '}'
     ].join('\n');
 };
+
+
+/**
+ * Adds a subordinFor compatibility with the Block interface.
+ *
+ * @param {DubStash.compiler.Block} block
+ */
+DubStash.compiler.PlaceholderBlock.prototype.addBlock = function(block){};
