@@ -64,7 +64,7 @@ var DubStash = {
 	 * @param {Object} startObj The object that the paths in the template refer to.
 	 * @param {string} startPath The path to the start object from the root object.
 	 * @param {Object} rootObj The root object. Must contain startObj somewhere in its hierarchy.
-	 * @return {Object}
+	 * @return {DubStash.runtime.Context}
 	 */
 	createContext: function(startObj, startPath, rootObj){},
 
@@ -73,7 +73,7 @@ var DubStash = {
 	 * @param {Array.<DubStash.ContextualRenderingFunction>} renderers
 	 * @param {Object} data
 	 * @param {boolean=} opt_ignoreUndefined
-	 * @param {Object=} opt_startContext
+	 * @param {DubStash.runtime.Context=} opt_startContext
 	 * @return {string}
 	 */
 	T: function(renderers, data, opt_ignoreUndefined, opt_startContext){},
@@ -117,12 +117,21 @@ var DubStash = {
 
 
 /**
- * @typedef {function(Object, boolean=, Object=):string}
+ * @typedef {function(Object, boolean=, DubStash.runtime.Context=):string}
  */
 DubStash.ExternalRenderingFunction;
 
 
 /**
- * @typedef {function(Object, boolean=):string}
+ * @typedef {function(DubStash.runtime.Context, boolean=):string}
  */
 DubStash.ContextualRenderingFunction;
+
+
+/**
+ * @param {Object} currentObj
+ * @param {string} currentPath
+ * @param {Object} rootObj
+ * @constructor
+ */
+DubStash.runtime.Context = function(currentObj, currentPath, rootObj){};
