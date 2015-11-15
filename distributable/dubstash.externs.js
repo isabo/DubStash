@@ -129,9 +129,6 @@ DubStash.ContextualRenderingFunction;
 
 
 /**
- * @param {Object} currentObj
- * @param {string} currentPath
- * @param {Object} rootObj
  * @constructor
  */
-DubStash.runtime.Context = function(currentObj, currentPath, rootObj){};
+DubStash.runtime.Context = function(){};
