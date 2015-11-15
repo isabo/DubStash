@@ -44,7 +44,7 @@ DubStash.compiler.ConditionBlock = function(name, isRecursive){
     /**
      * Series of blocks that apply when the property is truthy.
      *
-     * @type {!Array<Object>}
+     * @type {!Array<!DubStash.compiler.Block>}
      * @private
      */
     this.trueBlocks_ = [];
@@ -53,7 +53,7 @@ DubStash.compiler.ConditionBlock = function(name, isRecursive){
     /**
      * Series of blocks that apply when the property is falsy.
      *
-     * @type {!Array<Object>}
+     * @type {!Array<!DubStash.compiler.Block>}
      * @private
      */
     this.falseBlocks_ = [];
@@ -73,7 +73,7 @@ DubStash.compiler.ConditionBlock.prototype.foundElse = function(){
 /**
  * Adds a subordinate block.
  *
- * @param {DubStash.compiler.Block} block
+ * @param {!DubStash.compiler.Block} block
  */
     DubStash.compiler.ConditionBlock.prototype.addBlock = function(block){
 
@@ -127,7 +127,7 @@ DubStash.compiler.ConditionBlock.prototype.getRendererSource = function(){
 /**
  * Get an array of rendering functions for trueBlocks or falseBlocks.
  *
- * @param {!Array<DubStash.compiler.Block>} blocks Either trueBlocks or falseBlocks.
+ * @param {!Array<!DubStash.compiler.Block>} blocks Either trueBlocks or falseBlocks.
  * @return {!Array<DubStash.ContextualRenderingFunction>} Array of rendering functions to call at
  *        runtime.
  * @private
@@ -146,7 +146,7 @@ DubStash.compiler.ConditionBlock.prototype.getSubRenderers_ = function(blocks){
 /**
  * Get an array of the sources of rendering functions for trueBlocks or falseBlocks.
  *
- * @param {!Array<DubStash.compiler.Block>} blocks Either trueBlocks or falseBlocks.
+ * @param {!Array<!DubStash.compiler.Block>} blocks Either trueBlocks or falseBlocks.
  * @return {!Array<string>} Array of sources of rendering functions to call at runtime.
  * @private
  */

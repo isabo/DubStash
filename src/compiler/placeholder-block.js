@@ -87,6 +87,6 @@ DubStash.compiler.PlaceholderBlock.prototype.getRendererSource = function(){
 /**
  * Adds a subordinFor compatibility with the Block interface.
  *
- * @param {DubStash.compiler.Block} block
+ * @param {!DubStash.compiler.Block} block
  */
 DubStash.compiler.PlaceholderBlock.prototype.addBlock = function(block){};

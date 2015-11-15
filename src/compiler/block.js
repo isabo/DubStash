@@ -32,6 +32,6 @@ DubStash.compiler.Block.prototype.getRendererSource = function(){};
 /**
  * Adds a subordinate block during parsing.
  *
- * @param {DubStash.compiler.Block} block
+ * @param {!DubStash.compiler.Block} block
  */
 DubStash.compiler.Block.prototype.addBlock = function(block){};

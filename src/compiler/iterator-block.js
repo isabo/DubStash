@@ -24,7 +24,7 @@ DubStash.compiler.IteratorBlock = function(name){
     /**
      * Series of blocks to iterate for each value of the property.
      *
-     * @type {!Array<Object>}
+     * @type {!Array<!DubStash.compiler.Block>}
      * @private
      */
     this.blocks_ = [];
@@ -70,7 +70,7 @@ DubStash.compiler.IteratorBlock.prototype.getRendererSource = function(){
 /**
  * Adds a subordinate block during parsing.
  *
- * @param {DubStash.compiler.Block} block
+ * @param {!DubStash.compiler.Block} block
  */
 DubStash.compiler.IteratorBlock.prototype.addBlock = function(block){
 

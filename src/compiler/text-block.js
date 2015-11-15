@@ -87,6 +87,6 @@ DubStash.compiler.TextBlock.prototype.escapedText = function(){
 /**
  * For compatibility with the Block interface.
  *
- * @param {DubStash.compiler.Block} block
+ * @param {!DubStash.compiler.Block} block
  */
 DubStash.compiler.TextBlock.prototype.addBlock = function(block){};
