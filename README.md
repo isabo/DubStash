@@ -1,8 +1,6 @@
-[![Codeship Status for isabo/DubStash](
+DubStash [ ![Codeship Status for isabo/DubStash](
     https://codeship.com/projects/da2631c0-6ea7-0133-65b3-0a1b424f46cd/status?branch=master
     )](https://codeship.com/projects/115948)
-
-DubStash
 ========
 
 DubStash is a fast, lightweight and simple semantic template engine for HTML.
