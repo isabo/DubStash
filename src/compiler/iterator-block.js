@@ -1,6 +1,6 @@
 goog.provide('DubStash.compiler.IteratorBlock');
 
-goog.require('DubStash.Runtime');
+goog.require('DubStash.runtime.Runtime');
 
 
 /**
@@ -35,15 +35,16 @@ DubStash.compiler.IteratorBlock = function(name){
  * Returns a function that, when called, will generate the run-time text of the block according
  * to a supplied data object and options.
  *
- * @return {DubStash.ContextualRenderingFunction}
+ * @return {DubStash.functions.ContextualRenderingFunction}
  */
 DubStash.compiler.IteratorBlock.prototype.getRenderer = function(){
 
     // Curry the design-time configuration settings to the runtime rendering function.
     var self = this;
-    return /** @type {DubStash.ContextualRenderingFunction} */(function(context, ignoreUndefined){
+    return /** @type {DubStash.functions.ContextualRenderingFunction} */(function(context,
+            ignoreUndefined){
 
-        return DubStash.Runtime.getInstance().renderIteratorBlock(self.name_,
+        return DubStash.runtime.Runtime.getInstance().renderIteratorBlock(self.name_,
             self.getSubRenderers_(), context, ignoreUndefined);
     });
 };
@@ -81,8 +82,8 @@ DubStash.compiler.IteratorBlock.prototype.addBlock = function(block){
 /**
  * Get an array of rendering functions for the iterable blocks.
  *
- * @return {!Array<DubStash.ContextualRenderingFunction>} Array of rendering functions to call at
- *        runtime.
+ * @return {!Array<DubStash.functions.ContextualRenderingFunction>} Array of rendering functions to
+ *        call at runtime.
  * @private
  */
 DubStash.compiler.IteratorBlock.prototype.getSubRenderers_ = function(){

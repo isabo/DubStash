@@ -5,8 +5,8 @@
 
 goog.provide('DubStash');
 
-goog.require('DubStash.Compiler');
-goog.require('DubStash.Runtime');
+goog.require('DubStash.compiler.Compiler');
+goog.require('DubStash.runtime.Runtime');
 goog.require('DubStash.runtime.Context');
 
 
@@ -21,7 +21,7 @@ DubStash.VERSION = '1.0.0';
  * substitutions.
  *
  * @param {string} text The template text.
- * @return {DubStash.ExternalRenderingFunction}
+ * @return {DubStash.functions.ExternalRenderingFunction}
  * Where the params of the returned function are:
  *     {Object} data An object whose fields will be substituted into the placeholders, or
  *        tested by conditions.
@@ -34,7 +34,7 @@ DubStash.VERSION = '1.0.0';
  */
 DubStash.compile = function(text){
 
-    var compiler = new DubStash.Compiler(text);
+    var compiler = new DubStash.compiler.Compiler(text);
     return compiler.getRenderer();
 };
 
@@ -55,7 +55,7 @@ DubStash.compile = function(text){
  */
 DubStash.precompile = function(text){
 
-    var compiler = new DubStash.Compiler(text);
+    var compiler = new DubStash.compiler.Compiler(text);
     return compiler.getRendererSource();
 };
 
@@ -70,7 +70,7 @@ DubStash.precompile = function(text){
  */
 DubStash.registerGlobalTemplate = function(name, text){
 
-    DubStash.Runtime.getInstance().registerGlobalRenderer(name, DubStash.compile(text));
+    DubStash.runtime.Runtime.getInstance().registerGlobalRenderer(name, DubStash.compile(text));
 
     // Remember the template for use during precompileGlobalTemplates.
     DubStash.globalTemplates_[name] = text;
@@ -97,7 +97,7 @@ DubStash.precompileGlobalTemplates = function(){
 
     var lines = [''];
     for (var name in DubStash.globalTemplates_){
-        var compiler = new DubStash.Compiler(DubStash.globalTemplates_[name]);
+        var compiler = new DubStash.compiler.Compiler(DubStash.globalTemplates_[name]);
         lines.push('DubStash.G(\'' + name + '\', ' + compiler.getRendererSource() + ');');
     };
     return lines.join('\n');
@@ -114,7 +114,7 @@ DubStash.precompileGlobalTemplates = function(){
  */
 DubStash.registerGlobalData = function(name, data){
 
-    DubStash.Runtime.getInstance().registerGlobalData(name, data);
+    DubStash.runtime.Runtime.getInstance().registerGlobalData(name, data);
 };
 
 
@@ -134,11 +134,11 @@ DubStash.createContext = function(startObj, startPath, rootObj){
 };
 
 
-goog.exportSymbol('DubStash.G', DubStash.Runtime.registerGlobalRenderer);
-goog.exportSymbol('DubStash.T', DubStash.Runtime.renderTemplate);
-goog.exportSymbol('DubStash.P', DubStash.Runtime.renderPlaceHolderBlock);
-goog.exportSymbol('DubStash.C', DubStash.Runtime.renderConditionBlock);
-goog.exportSymbol('DubStash.I', DubStash.Runtime.renderIteratorBlock);
+goog.exportSymbol('DubStash.G', DubStash.runtime.Runtime.registerGlobalRenderer);
+goog.exportSymbol('DubStash.T', DubStash.runtime.Runtime.renderTemplate);
+goog.exportSymbol('DubStash.P', DubStash.runtime.Runtime.renderPlaceHolderBlock);
+goog.exportSymbol('DubStash.C', DubStash.runtime.Runtime.renderConditionBlock);
+goog.exportSymbol('DubStash.I', DubStash.runtime.Runtime.renderIteratorBlock);
 
 
 // Make available in Node or the browser.

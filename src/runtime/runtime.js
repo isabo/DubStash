@@ -1,4 +1,4 @@
-goog.provide('DubStash.Runtime');
+goog.provide('DubStash.runtime.Runtime');
 
 goog.require('DubStash.runtime.Context');
 
@@ -9,8 +9,8 @@ goog.require('DubStash.runtime.Context');
  *
  * @constructor
  */
-DubStash.Runtime = function(){};
-goog.addSingletonGetter(DubStash.Runtime);
+DubStash.runtime.Runtime = function(){};
+goog.addSingletonGetter(DubStash.runtime.Runtime);
 
 
 /**
@@ -18,9 +18,9 @@ goog.addSingletonGetter(DubStash.Runtime);
  * context (i.e. without prefixing with ../ etc.).
  *
  * @param {string} name A unique name for the template.
- * @param {DubStash.ExternalRenderingFunction} renderer A rendering function.
+ * @param {DubStash.functions.ExternalRenderingFunction} renderer A rendering function.
  */
-DubStash.Runtime.prototype.registerGlobalRenderer = function(name, renderer){
+DubStash.runtime.Runtime.prototype.registerGlobalRenderer = function(name, renderer){
 
     this.globalRenderers_[name] = renderer;
 };
@@ -31,19 +31,19 @@ DubStash.Runtime.prototype.registerGlobalRenderer = function(name, renderer){
  * instance.
  *
  * @param {string} name A unique name for the template.
- * @param {DubStash.ExternalRenderingFunction} renderer A rendering function.
+ * @param {DubStash.functions.ExternalRenderingFunction} renderer A rendering function.
  */
-DubStash.Runtime.registerGlobalRenderer = function(name, renderer){
+DubStash.runtime.Runtime.registerGlobalRenderer = function(name, renderer){
 
-    DubStash.Runtime.getInstance().registerGlobalRenderer(name, renderer);
+    DubStash.runtime.Runtime.getInstance().registerGlobalRenderer(name, renderer);
 };
 
 
 /**
  * @private
- * @type {Object<string,DubStash.ExternalRenderingFunction>}
+ * @type {Object<string,DubStash.functions.ExternalRenderingFunction>}
  */
-DubStash.Runtime.prototype.globalRenderers_ = {};
+DubStash.runtime.Runtime.prototype.globalRenderers_ = {};
 
 
 /**
@@ -53,7 +53,7 @@ DubStash.Runtime.prototype.globalRenderers_ = {};
  * @param {string} name A unique name for the data.
  * @param {Object|string} data The data object or string.
  */
-DubStash.Runtime.prototype.registerGlobalData = function(name, data){
+DubStash.runtime.Runtime.prototype.registerGlobalData = function(name, data){
 
     this.globalData_[name] = data;
 };
@@ -63,21 +63,21 @@ DubStash.Runtime.prototype.registerGlobalData = function(name, data){
  * @private
  * @type {Object<string, (Object|string)>}
  */
-DubStash.Runtime.prototype.globalData_ = {};
+DubStash.runtime.Runtime.prototype.globalData_ = {};
 
 
 /**
  * Renders a compiled template (supplied in the form of a series of renderer functions
  * that were curried into the calling function).
  *
- * @param {Array<DubStash.ContextualRenderingFunction>} renderers
+ * @param {Array<DubStash.functions.ContextualRenderingFunction>} renderers
  * @param {Object} data
  * @param {boolean=} opt_ignoreUndefined
  * @param {DubStash.runtime.Context=} opt_startContext Context to start with. This is necessary when
  *        rendering a recursive template inside an iteration. For internal use only.
  * @return {string}
  */
-DubStash.Runtime.prototype.renderTemplate = function(renderers, data, opt_ignoreUndefined,
+DubStash.runtime.Runtime.prototype.renderTemplate = function(renderers, data, opt_ignoreUndefined,
         opt_startContext){
 
     // Create a context for the renderers to use.
@@ -95,16 +95,16 @@ DubStash.Runtime.prototype.renderTemplate = function(renderers, data, opt_ignore
  * The version of renderTemplate that is callable from a compiled function, i.e. without an
  * instance.
  *
- * @param {Array<DubStash.ContextualRenderingFunction>} renderers
+ * @param {Array<DubStash.functions.ContextualRenderingFunction>} renderers
  * @param {Object} data
  * @param {boolean=} opt_ignoreUndefined
  * @param {DubStash.runtime.Context=} opt_startContext Context to start with. This is necessary when
  *        rendering a recursive template inside an iteration. For internal use only.
  * @return {string}
  */
-DubStash.Runtime.renderTemplate = function(renderers, data, opt_ignoreUndefined, opt_startContext){
+DubStash.runtime.Runtime.renderTemplate = function(renderers, data, opt_ignoreUndefined, opt_startContext){
 
-    return DubStash.Runtime.getInstance().renderTemplate(renderers, data, opt_ignoreUndefined,
+    return DubStash.runtime.Runtime.getInstance().renderTemplate(renderers, data, opt_ignoreUndefined,
         opt_startContext);
 };
 
@@ -119,7 +119,7 @@ DubStash.Runtime.renderTemplate = function(renderers, data, opt_ignoreUndefined,
  * @param {boolean=} ignoreUndefined
  * @return {string}
  */
-DubStash.Runtime.prototype.renderPlaceHolderBlock = function(name, isRecursive, htmlEscape, context,
+DubStash.runtime.Runtime.prototype.renderPlaceHolderBlock = function(name, isRecursive, htmlEscape, context,
         ignoreUndefined){
 
     var value = this.getValue_(name, context);
@@ -161,11 +161,11 @@ DubStash.Runtime.prototype.renderPlaceHolderBlock = function(name, isRecursive, 
  * @param {boolean=} ignoreUndefined
  * @return {string}
  */
-DubStash.Runtime.renderPlaceHolderBlock = function(name, isRecursive, htmlEscape, context,
+DubStash.runtime.Runtime.renderPlaceHolderBlock = function(name, isRecursive, htmlEscape, context,
         ignoreUndefined){
 
-    return DubStash.Runtime.getInstance().renderPlaceHolderBlock(name, isRecursive, htmlEscape,
-        context, ignoreUndefined);
+    return DubStash.runtime.Runtime.getInstance().renderPlaceHolderBlock(name, isRecursive,
+        htmlEscape, context, ignoreUndefined);
 };
 
 
@@ -174,13 +174,13 @@ DubStash.Runtime.renderPlaceHolderBlock = function(name, isRecursive, htmlEscape
  *
  * @param {string} name
  * @param {boolean} isRecursive
- * @param {Array<DubStash.ContextualRenderingFunction>} trueRenderers
- * @param {Array<DubStash.ContextualRenderingFunction>} falseRenderers
+ * @param {Array<DubStash.functions.ContextualRenderingFunction>} trueRenderers
+ * @param {Array<DubStash.functions.ContextualRenderingFunction>} falseRenderers
  * @param {DubStash.runtime.Context} context
  * @param {boolean=} ignoreUndefined
  * @return {string}
  */
-DubStash.Runtime.prototype.renderConditionBlock = function(name, isRecursive, trueRenderers,
+DubStash.runtime.Runtime.prototype.renderConditionBlock = function(name, isRecursive, trueRenderers,
         falseRenderers, context, ignoreUndefined){
 
     // Get the value, recursively if necessary.
@@ -213,17 +213,17 @@ DubStash.Runtime.prototype.renderConditionBlock = function(name, isRecursive, tr
  *
  * @param {string} name
  * @param {boolean} isRecursive
- * @param {Array<DubStash.ContextualRenderingFunction>} trueRenderers
- * @param {Array<DubStash.ContextualRenderingFunction>} falseRenderers
+ * @param {Array<DubStash.functions.ContextualRenderingFunction>} trueRenderers
+ * @param {Array<DubStash.functions.ContextualRenderingFunction>} falseRenderers
  * @param {DubStash.runtime.Context} context
  * @param {boolean=} ignoreUndefined
  * @return {string}
  */
-DubStash.Runtime.renderConditionBlock = function(name, isRecursive, trueRenderers, falseRenderers,
-        context, ignoreUndefined){
+DubStash.runtime.Runtime.renderConditionBlock = function(name, isRecursive, trueRenderers,
+        falseRenderers, context, ignoreUndefined){
 
-    return DubStash.Runtime.getInstance().renderConditionBlock(name, isRecursive, trueRenderers,
-        falseRenderers, context, ignoreUndefined);
+    return DubStash.runtime.Runtime.getInstance().renderConditionBlock(name, isRecursive,
+        trueRenderers, falseRenderers, context, ignoreUndefined);
 };
 
 
@@ -231,12 +231,12 @@ DubStash.Runtime.renderConditionBlock = function(name, isRecursive, trueRenderer
  * Iterates through a collection and renders the block for each value.
  *
  * @param {string} name
- * @param {Array<DubStash.ContextualRenderingFunction>} subRenderers
+ * @param {Array<DubStash.functions.ContextualRenderingFunction>} subRenderers
  * @param {DubStash.runtime.Context} context
  * @param {boolean=} ignoreUndefined
  * @return {string}
  */
-DubStash.Runtime.prototype.renderIteratorBlock = function(name, subRenderers, context,
+DubStash.runtime.Runtime.prototype.renderIteratorBlock = function(name, subRenderers, context,
         ignoreUndefined){
 
     // Get the value, which should be an iterable collection.
@@ -274,14 +274,15 @@ DubStash.Runtime.prototype.renderIteratorBlock = function(name, subRenderers, co
  * instance.
  *
  * @param {string} name
- * @param {Array<DubStash.ContextualRenderingFunction>} subRenderers
+ * @param {Array<DubStash.functions.ContextualRenderingFunction>} subRenderers
  * @param {DubStash.runtime.Context} context
  * @param {boolean=} ignoreUndefined
  * @return {string}
  */
-DubStash.Runtime.renderIteratorBlock = function(name, subRenderers, context, ignoreUndefined){
+DubStash.runtime.Runtime.renderIteratorBlock = function(name, subRenderers, context,
+        ignoreUndefined){
 
-    return DubStash.Runtime.getInstance().renderIteratorBlock(name, subRenderers, context,
+    return DubStash.runtime.Runtime.getInstance().renderIteratorBlock(name, subRenderers, context,
         ignoreUndefined);
 };
 
@@ -292,10 +293,10 @@ DubStash.Runtime.renderIteratorBlock = function(name, subRenderers, context, ign
  * item has a recursive placeholder.
  *
  * @param {string} text
- * @return {DubStash.ExternalRenderingFunction}
+ * @return {DubStash.functions.ExternalRenderingFunction}
  * @private
  */
-DubStash.Runtime.prototype.compileRecursive_ = function(text){
+DubStash.runtime.Runtime.prototype.compileRecursive_ = function(text){
 
     var renderer;
     if (text){
@@ -311,7 +312,7 @@ DubStash.Runtime.prototype.compileRecursive_ = function(text){
 };
 
 
-DubStash.Runtime.prototype.rendererCache_ = {};
+DubStash.runtime.Runtime.prototype.rendererCache_ = {};
 
 
 /**
@@ -323,7 +324,7 @@ DubStash.Runtime.prototype.rendererCache_ = {};
  * @return {*}
  * @private
  */
-DubStash.Runtime.prototype.getValue_ = function(name, context){
+DubStash.runtime.Runtime.prototype.getValue_ = function(name, context){
 
     // If name starts with ../ we need to change context to an ancestor.
     context = this.getAncestorContext_(name, context); // Just do the climbing
@@ -383,7 +384,7 @@ DubStash.Runtime.prototype.getValue_ = function(name, context){
  * @return {*}
  * @private
  */
-DubStash.Runtime.prototype.evaluate_ = function(context, property){
+DubStash.runtime.Runtime.prototype.evaluate_ = function(context, property){
 
     var obj = context.currentObj;
     var value;
@@ -441,7 +442,7 @@ DubStash.Runtime.prototype.evaluate_ = function(context, property){
  * @param {DubStash.runtime.Context} context
  * @private
  */
-DubStash.Runtime.prototype.getAncestorContext_ = function(name, context){
+DubStash.runtime.Runtime.prototype.getAncestorContext_ = function(name, context){
 
     // Find how many levels to climb.
     var levels = name.split('../').length - 1; // Assumes all ../ at the beginning.
@@ -498,7 +499,7 @@ DubStash.Runtime.prototype.getAncestorContext_ = function(name, context){
  * @param {function(*)} callback Called with each member as a parameter.
  * @private
  */
-DubStash.Runtime.prototype.forEach_ = function(collection, callback){
+DubStash.runtime.Runtime.prototype.forEach_ = function(collection, callback){
 
     if (typeof collection.forEach === 'function'){
         // The collection already has this functionality, so use it.
@@ -545,12 +546,12 @@ DubStash.Runtime.prototype.forEach_ = function(collection, callback){
  * @return {string}
  * @private
  */
-DubStash.Runtime.prototype.htmlEscape_ = function(str) {
+DubStash.runtime.Runtime.prototype.htmlEscape_ = function(str) {
 
-    return str.replace(DubStash.Runtime.RE_AMP_, '&amp;')
-              .replace(DubStash.Runtime.RE_LT_, '&lt;')
-              .replace(DubStash.Runtime.RE_GT_, '&gt;')
-              .replace(DubStash.Runtime.RE_QUOT_, '&quot;');
+    return str.replace(DubStash.runtime.Runtime.RE_AMP_, '&amp;')
+              .replace(DubStash.runtime.Runtime.RE_LT_, '&lt;')
+              .replace(DubStash.runtime.Runtime.RE_GT_, '&gt;')
+              .replace(DubStash.runtime.Runtime.RE_QUOT_, '&quot;');
 };
 
 
@@ -558,31 +559,32 @@ DubStash.Runtime.prototype.htmlEscape_ = function(str) {
  * @type {RegExp}
  * @private
  */
-DubStash.Runtime.RE_LT_ = /</g;
+DubStash.runtime.Runtime.RE_LT_ = /</g;
 
 
 /**
  * @type {RegExp}
  * @private
  */
-DubStash.Runtime.RE_GT_ = />/g;
+DubStash.runtime.Runtime.RE_GT_ = />/g;
 
 
 /**
  * @type {RegExp}
  * @private
  */
-DubStash.Runtime.RE_AMP_ = /&/g;
+DubStash.runtime.Runtime.RE_AMP_ = /&/g;
 
 
 /**
  * @type {RegExp}
  * @private
  */
-DubStash.Runtime.RE_QUOT_ = /\"/g;
+DubStash.runtime.Runtime.RE_QUOT_ = /\"/g;
 
 /**
  * @private
  */
-DubStash.Runtime.prototype.globalContext_ = new DubStash.runtime.Context(
-    DubStash.Runtime.getInstance().globalData_, '', DubStash.Runtime.getInstance().globalData_);
+DubStash.runtime.Runtime.prototype.globalContext_ = new DubStash.runtime.Context(
+    DubStash.runtime.Runtime.getInstance().globalData_, '',
+    DubStash.runtime.Runtime.getInstance().globalData_);

@@ -1,6 +1,6 @@
 goog.provide('DubStash.compiler.PlaceholderBlock');
 
-goog.require('DubStash.Runtime');
+goog.require('DubStash.runtime.Runtime');
 
 
 /**
@@ -48,16 +48,17 @@ DubStash.compiler.PlaceholderBlock = function(name, isRecursive, htmlEscape){
  * Returns a function that when called will generate the run-time text of the block according to
  * a supplied data object and options.
  *
- * @return {DubStash.ContextualRenderingFunction}
+ * @return {DubStash.functions.ContextualRenderingFunction}
  */
 DubStash.compiler.PlaceholderBlock.prototype.getRenderer = function(){
 
     // Curry the design-time configuration settings into the runtime rendering function.
     var self = this;
-    return /** @type {DubStash.ContextualRenderingFunction} */(function(context, ignoreUndefined){
+    return /** @type {DubStash.functions.ContextualRenderingFunction} */(function(context,
+            ignoreUndefined){
 
-        return DubStash.Runtime.getInstance().renderPlaceHolderBlock(self.name_, self.isRecursive_,
-            self.htmlEscape_, context, ignoreUndefined);
+        return DubStash.runtime.Runtime.getInstance().renderPlaceHolderBlock(self.name_,
+            self.isRecursive_, self.htmlEscape_, context, ignoreUndefined);
     });
 };
 

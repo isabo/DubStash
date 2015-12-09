@@ -1,6 +1,6 @@
 goog.provide('DubStash.compiler.ConditionBlock');
 
-goog.require('DubStash.Runtime');
+goog.require('DubStash.runtime.Runtime');
 
 
 /**
@@ -86,7 +86,7 @@ DubStash.compiler.ConditionBlock.prototype.foundElse = function(){
  * Returns a function that, when called, will generate the run-time text of the block according
  * to a supplied data object and options.
  *
- * @return {DubStash.ContextualRenderingFunction}
+ * @return {DubStash.functions.ContextualRenderingFunction}
  */
 DubStash.compiler.ConditionBlock.prototype.getRenderer = function(){
 
@@ -96,10 +96,11 @@ DubStash.compiler.ConditionBlock.prototype.getRenderer = function(){
     var trueRenderers = this.getSubRenderers_(this.trueBlocks_);
     var falseRenderers = this.getSubRenderers_(this.falseBlocks_);
 
-    return /** @type {DubStash.ContextualRenderingFunction} */(function(context, ignoreUndefined){
+    return /** @type {DubStash.functions.ContextualRenderingFunction} */(function(context,
+            ignoreUndefined){
 
-        return DubStash.Runtime.getInstance().renderConditionBlock(name, isRecursive, trueRenderers,
-            falseRenderers, context, ignoreUndefined);
+        return DubStash.runtime.Runtime.getInstance().renderConditionBlock(name, isRecursive,
+            trueRenderers, falseRenderers, context, ignoreUndefined);
     });
 };
 
@@ -128,8 +129,8 @@ DubStash.compiler.ConditionBlock.prototype.getRendererSource = function(){
  * Get an array of rendering functions for trueBlocks or falseBlocks.
  *
  * @param {!Array<!DubStash.compiler.Block>} blocks Either trueBlocks or falseBlocks.
- * @return {!Array<DubStash.ContextualRenderingFunction>} Array of rendering functions to call at
- *        runtime.
+ * @return {!Array<DubStash.functions.ContextualRenderingFunction>} Array of rendering functions to
+ *        call at runtime.
  * @private
  */
 DubStash.compiler.ConditionBlock.prototype.getSubRenderers_ = function(blocks){

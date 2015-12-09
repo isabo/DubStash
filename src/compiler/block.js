@@ -15,7 +15,7 @@ DubStash.compiler.Block = function(var_args){};
  * Returns a function that, when called, will generate the run-time text of the block according
  * to a supplied data object and options.
  *
- * @return {DubStash.ContextualRenderingFunction}
+ * @return {DubStash.functions.ContextualRenderingFunction}
  */
 DubStash.compiler.Block.prototype.getRenderer = function(){};
 
