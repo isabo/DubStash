@@ -274,7 +274,7 @@ output += 'var render = ' + rendererSource;
 
 The resulting output will look like this:
 ```js
-DubStash.Runtime.registerGlobalRenderer('bestName', function( ... ){ ... });
+DubStash.G('bestName', function( ... ){ ... });
 var render = function( ... ){ ... }
 ```
 
