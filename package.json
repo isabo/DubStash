@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "node_modules/.bin/tape test/**test.js | node_modules/.bin/faucet",
-    "build": "node build/build.js"
+    "build": "node build/build.js",
+    "gendocs": "java -jar ./build/dossier-0.7.2.jar -c ./build/dossier-config.json"
   },
   "repository": {
     "type": "git",
