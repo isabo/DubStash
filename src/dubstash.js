@@ -11,9 +11,12 @@ goog.require('DubStash.runtime.Context');
 
 
 /**
+ * The current version of this library.
+ *
+ * @define {string}
  * @export
  */
-DubStash.VERSION = '1.0.0';
+DubStash.VERSION = '1.0.0-dev';
 
 
 /**

@@ -48,6 +48,17 @@ function test_render(t, tpl, data, expected, comment) {
 
 
 /**
+ * Verify that the compiled version matches the version number in package.json.
+ */
+test('Correct version has been compiled', function(t) {
+
+    var expectedVersion = require('../package.json').version;
+    t.equal(DubStash.VERSION, expectedVersion, 'Version is correct: ' + expectedVersion);
+    t.end();
+});
+
+
+/**
  * Test the trivial case in which a placeholder should be replaced by an object property value.
  */
 test('Simple placeholder', function(t) {

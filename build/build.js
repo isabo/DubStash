@@ -1,3 +1,7 @@
+// Read the version from the NPM package file.
+var version = require('../package.json').version;
+
+
 var compiler = require('closure-compiler');
 
 var options = {
@@ -8,7 +12,8 @@ var options = {
         compilation_level: 'ADVANCED',
         warning_level: 'VERBOSE',
         summary_detail_level: '3',
-        generate_exports: true
+        generate_exports: true,
+        define: "DubStash.VERSION='" + version + "'"
     };
 
 compiler.compile(undefined, options, function(err, stdout, stderr) {
