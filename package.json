@@ -9,7 +9,8 @@
   "scripts": {
     "test": "node_modules/.bin/tape test/**test.js | node_modules/.bin/faucet",
     "build": "node build/build.js",
-    "gendocs": "java -jar ./build/dossier-0.7.2.jar -c ./build/dossier-config.json"
+    "compile": "node build/compile.js",
+    "docs": "node build/generate-docs.js"
   },
   "repository": {
     "type": "git",
@@ -31,6 +32,7 @@
     "faucet": "0.0.1",
     "google-closure-compiler": "^20151015.0.0",
     "google-closure-library": "^20151015.0.0",
+    "js-dossier": "isabo/js-dossier-npm",
     "tape": "^4.2.1"
   }
 }
