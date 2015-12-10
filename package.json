@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "Fast, lightweight semantic template engine for HTML.",
   "main": "distributable/dubstash.min.js",
-  "directories": {
-    "test": "test"
-  },
   "scripts": {
     "test": "node_modules/.bin/tape test/**test.js | node_modules/.bin/faucet",
     "build": "node build/build.js",
