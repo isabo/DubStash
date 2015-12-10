@@ -5,6 +5,8 @@ var generateDocs = require('./generate-docs');
 // If it compiles, generate the documentation.
 compile().
     then(generateDocs).
-    catch(function(err) {
-        process.exit(1)
+    then(function() {
+        process.exit(0);
+    }, function(err) {
+        process.exit(1);
     });

@@ -36,6 +36,6 @@ var compile = module.exports = function() {
 if (!module.parent) {
     compile().
         catch(function(err) {
-            process.exit(1)
+            process.exit(1);
         });
 }

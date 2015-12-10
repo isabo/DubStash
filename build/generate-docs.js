@@ -29,6 +29,6 @@ var generateDocs = module.exports = function() {
 if (!module.parent) {
     generateDocs().
         catch(function(err) {
-            process.exit(1)
+            process.exit(1);
         });
 }
