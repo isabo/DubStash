@@ -14,7 +14,7 @@ var COMMAND = 'java -jar ' + JAR_PATH + ' -c ./build/dossier-config.json';
  */
 var generateDocs = module.exports = function() {
     return new Promise(function(resolve, reject) {
-        exec(COMMAND, function(err, stdout, stderr) {
+        exec(COMMAND, {maxBuffer: 400 * 1024}, function(err, stdout, stderr) {
             console.log(stdout);
             if (err) {
                 console.log(stderr);
