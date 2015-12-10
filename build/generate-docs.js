@@ -29,6 +29,7 @@ var generateDocs = module.exports = function() {
 if (!module.parent) {
     generateDocs().
         catch(function(err) {
+            console.error(err);
             process.exit(1);
         });
 }

@@ -8,5 +8,6 @@ compile().
     then(function() {
         process.exit(0);
     }, function(err) {
+        console.error(err);
         process.exit(1);
     });
