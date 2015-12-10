@@ -35,5 +35,7 @@ var compile = module.exports = function() {
 // Execute immediately if this module was invoked directly.
 if (!module.parent) {
     compile().
-        catch(() => process.exit(1));
+        catch(function(err) {
+            process.exit(1)
+        });
 }
