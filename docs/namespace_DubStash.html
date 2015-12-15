@@ -1,0 +1,37 @@
+<!DOCTYPE html><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"><meta http-equiv="Content-Language" content="en"><meta http-equiv="X-UA-Compatible" content="IE=edge"><title>DubStash</title><link href="dossier.css" rel="stylesheet" type="text/css"><header><div><form><div><input type="search" placeholder="Search" tabindex="1"></div></form></div></header><main><article><div class="codelink"><a href="source/src/compiler/text-block.js.src.html#l1">View Source</a></div><h1>namespace DubStash</h1><h2>Functions</h2><div id="compile" class="function"><div><h3>compile(<wbr>text)<span class="codelink"><a href="source/src/dubstash.js.src.html#l38">code »</a></span></h3><p>Get a function that, when called, writes out the template while performing the necessary
+substitutions.</p>
+<div><div class="fn-details"><div><b>Parameters</b></div><dl><dt>text<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code><dd><p>The template text.</p>
+</dl></div><div class="fn-details"><div><b>Returns</b></div><dl><dt><code>function(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a>=, ?DubStash.runtime.Context=): <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code><dd><p>Where the params of the returned function are:
+{Object} data An object whose fields will be substituted into the placeholders, or
+tested by conditions.
+{boolean&#61;} opt_ignoreUndefined Whether to leave alone placeholders whose value is
+undefined or to replace them with nothing (default: replace with nothing).
+{Context&#61;} opt_startContext A context created by calling createContext. Specifies that
+all paths in the template should be considered relative to the current context
+object, and not relative to the &#39;data&#39; object.</p>
+</dl></div></div></div></div><hr class="fn-sep"><div id="createContext" class="function"><div><h3>createContext(<wbr>startObj, startPath, rootObj)<span class="codelink"><a href="source/src/dubstash.js.src.html#l134">code »</a></span></h3><p>Create a context for use when calling the rendering function that results from
+compiling a template.</p>
+<div><div class="fn-details"><div><b>Parameters</b></div><dl><dt>startObj<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code><dd><p>The object that the paths in the template refer to.</p>
+<dt>startPath<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code><dd><p>The path to the start object from the root object.</p>
+<dt>rootObj<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code><dd><p>The root object. Must contain startObj somewhere in its hierarchy.</p>
+</dl></div><div class="fn-details"><div><b>Returns</b></div><dl><dt><code>DubStash.runtime.Context</code></dl></div></div></div></div><hr class="fn-sep"><div id="precompile" class="function"><div><h3>precompile(<wbr>text)<span class="codelink"><a href="source/src/dubstash.js.src.html#l59">code »</a></span></h3><p>Get the source of a function that when called writes out the template while performing
+the necessary substitutions. The source can then be saved and used instead of the
+template.</p>
+<div><div class="fn-details"><div><b>Parameters</b></div><dl><dt>text<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code><dd><p>The template text.</p>
+</dl></div><div class="fn-details"><div><b>Returns</b></div><dl><dt><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code><dd><p>Where the params of the returned function are:
+{Object} data An object whose fields will be substituted into the placeholders, or
+tested by conditions.
+{boolean&#61;} opt_ignoreUndefined Whether to leave alone placeholders whose value is
+undefined or to replace them with nothing (default: replace with nothing).</p>
+</dl></div></div></div></div><hr class="fn-sep"><div id="precompileGlobalTemplates" class="function"><div><h3>precompileGlobalTemplates()<span class="codelink"><a href="source/src/dubstash.js.src.html#l99">code »</a></span></h3><p>Get the Javascript source code that, at run time, will register all the current global
+templates, in their precompiled form.</p>
+<div><div class="fn-details"><div><b>Returns</b></div><dl><dt><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code></dl></div></div></div></div><hr class="fn-sep"><div id="registerGlobalData" class="function"><div><h3>registerGlobalData(<wbr>name, data)<span class="codelink"><a href="source/src/dubstash.js.src.html#l118">code »</a></span></h3><p>Register a named data object that can be used anywhere in the hierarchy without changing
+context (i.e. without prefixing with ../ etc.).</p>
+<div><div class="fn-details"><div><b>Parameters</b></div><dl><dt>name<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code><dd><p>A unique name for the data.</p>
+<dt>data<code>?(<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>|<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code><dd><p>The data object or string.</p>
+</dl></div></div></div></div><hr class="fn-sep"><div id="registerGlobalTemplate" class="function"><div><h3>registerGlobalTemplate(<wbr>name, text)<span class="codelink"><a href="source/src/dubstash.js.src.html#l74">code »</a></span></h3><p>Register a named sub-template that can be used anywhere in the hierarchy without changing
+context (i.e. without prefixing with ../ etc.), as if it is the value of a property.</p>
+<div><div class="fn-details"><div><b>Parameters</b></div><dl><dt>name<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code><dd><p>A unique name for the template.</p>
+<dt>text<code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code><dd><p>The uncompiled text of the template.</p>
+</dl></div></div></div></div><h2>Compiler Constants</h2><div id="VERSION" class="property"><dl><dt><a href="source/src/dubstash.js.src.html#l19">VERSION</a><code><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code><dd><p>The current version of this library.</p>
+</dl></div></article><nav><h3><a href="index.html" tabindex="2">Overview</a></h3><div><input type="checkbox" id="nav-types" checked/><label for="nav-types"><h3><span class="selectable" tabindex="2">Types</span></h3></label><div id="nav-types-view"></div></div></nav></main><footer><div><a href="https://github.com/jleyba/js-dossier">Generated by dossier</a></div></footer><script src="types.js"></script><script src="dossier.js"></script>

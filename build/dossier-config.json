@@ -1,0 +1,20 @@
+{
+    "output": "docs",
+    "readme": "README.md",
+    "sources": [
+        "src/**.js"
+    ],
+    "excludes": [
+        "src/externs/**"
+    ],
+    "externs": [
+        "src/externs/**.js"
+    ],
+    "typeFilters": [
+        "Collection_",
+        "^DubStash\\.functions.*",
+        "^DubStash\\.runtime.*",
+        "^DubStash\\.compiler.*"
+    ],
+    "closureLibraryDir": "node_modules/google-closure-library/closure/goog"
+}

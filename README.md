@@ -1,7 +1,7 @@
-DubStash
+DubStash [ ![Codeship Status for isabo/DubStash](https://codeship.com/projects/da2631c0-6ea7-0133-65b3-0a1b424f46cd/status?branch=master)](https://codeship.com/projects/115948)
 ========
 
-DubStash is a fast, lightweight and simple semantic template engine for HTML. 
+DubStash is a fast, lightweight and simple semantic template engine for HTML.
 
 * Use it in a client-side browser or on a back-end Node.js server.
 * Compile a template once, then use it repeatedly with different data.
@@ -11,7 +11,7 @@ DubStash is a fast, lightweight and simple semantic template engine for HTML.
 ## tl;dr
 
 * `<script src="dubstash.min.js"></script>` [Details...](#deploying)
-* {{[propertyName](#basic-usage)}} writes out HTML-escaped value; {{{propertyName}}} writes out 
+* {{[propertyName](#basic-usage)}} writes out HTML-escaped value; {{{propertyName}}} writes out
   value without HTML-escaping it.
 * {{<strong>[if](#conditions)</strong> propertyName}} *output this text* {{else}} *output this other
   text* {{end if}}
@@ -24,39 +24,39 @@ DubStash is a fast, lightweight and simple semantic template engine for HTML.
 
 ### Basic Usage
 
-* Define a template that contains `{{placeholders}}` for values that will be substituted at runtime. 
+* Define a template that contains `{{placeholders}}` for values that will be substituted at runtime.
 * Generate a rendering function by compiling the template.
-* Call the rendering function with an object that contains the data to subsitute for the 
-  `{{placeholders}}`. 
-* The text that replaces `{{placeholders}}` is escaped for safe use in HTML, unless you use a 
+* Call the rendering function with an object that contains the data to subsitute for the
+  `{{placeholders}}`.
+* The text that replaces `{{placeholders}}` is escaped for safe use in HTML, unless you use a
   `{{{triple-stash}}}` (not shown).
 
 ```js
 // Define the template. You normally won't do this using Javascript. Instead you can use the new
 // HTML5 <template> tag, or put your templates inside <script type="text/dubstash">...</script>,
-// and assign the contents to a Javascript variable using the script tag's innerHTML property. 
+// and assign the contents to a Javascript variable using the script tag's innerHTML property.
 var template = '<ul><li>My name is {{name}}.</li>' +
-			   '<li>I live in {{address.city}}.</li>' +
-			   '<li>My favourite cartoon is {{cartoon}}.</li></ul>';	
+               '<li>I live in {{address.city}}.</li>' +
+               '<li>My favourite cartoon is {{cartoon}}.</li></ul>';
 
 // Generate a rendering function that can be used multiple times with different data.
 var render = DubStash.compile(template);
 
 // Define some example data objects.
 var person1 = {
-	name: 'John Smith',
-	address: {
-		city: 'Cardiff'
-	},
-	cartoon: 'Calvin & Hobbes'
+    name: 'John Smith',
+    address: {
+        city: 'Cardiff'
+    },
+    cartoon: 'Calvin & Hobbes'
 };
 
 var person2 = {
-	name: 'Fred Bloggs',
-	address: {
-		city: 'Swansea'
-	},
-	cartoon: 'Tom & Jerry'
+    name: 'Fred Bloggs',
+    address: {
+        city: 'Swansea'
+    },
+    cartoon: 'Tom & Jerry'
 };
 
 // Render the template with different data.
@@ -67,9 +67,9 @@ var output2 = render(person2);
 The value of `output1` is:
 ```html
 <ul>
-	<li>My name is John Smith.</li>
-	<li>I live in Cardiff.</li>
-	<li>My favourite cartoon is Calvin &amp; Hobbes.</li>
+    <li>My name is John Smith.</li>
+    <li>I live in Cardiff.</li>
+    <li>My favourite cartoon is Calvin &amp; Hobbes.</li>
 </ul>
 
 <!-- Linebreaks and indents added for clarity -->
@@ -78,9 +78,9 @@ The value of `output1` is:
 The value of `output2` is:
 ```html
 <ul>
-	<li>My name is Fred Bloggs.</li>
-	<li>I live in Swansea.</li>
-	<li>My favourite cartoon is Tom &amp; Jerry.</li>
+    <li>My name is Fred Bloggs.</li>
+    <li>I live in Swansea.</li>
+    <li>My favourite cartoon is Tom &amp; Jerry.</li>
 </ul>
 
 <!-- Linebreaks and indents added for clarity -->
@@ -90,25 +90,25 @@ The value of `output2` is:
 
 * You can loop over values that are collections of objects, repeating a snippet of template for each
   one.
-* Inside the loop, the data object is the current member of the collection being iterated. In the 
+* Inside the loop, the data object is the current member of the collection being iterated. In the
   example below `{{name}}` is used twice, but the second instance refers to a different person.
   * Inside a loop, you can still access the parent object by prefixing the property name with `../`
-    or `../../` etc. 
-* Not only arrays can be iterated. Objects can be iterated, as well as anything that has a `forEach` 
-  method. 
+    or `../../` etc.
+* Not only arrays can be iterated. Objects can be iterated, as well as anything that has a `forEach`
+  method.
 
 ```js
 var template = '<p>These are the people that {{name}} invited:</p>' +
-			   '<ul>{{foreach invitees}}<li>{{name}} (invited by {{../../name}})</li>{{end foreach}}</ul>';
+               '<ul>{{foreach invitees}}<li>{{name}} (invited by {{../../name}})</li>{{end foreach}}</ul>';
 var render = DubStash.compile(template);
 
 var person = {
-	name: 'John Smith',
-	invitees: [
-		{name: 'Fred Bloggs'},
-		{name: 'Jack Jackson'},
-		{name: 'Mary Black'}
-	]
+    name: 'John Smith',
+    invitees: [
+        {name: 'Fred Bloggs'},
+        {name: 'Jack Jackson'},
+        {name: 'Mary Black'}
+    ]
 };
 
 var output = render(person);
@@ -118,9 +118,9 @@ The value of `output` is:
 ```html
 <p>These are the people that John Smith invited:</p>
 <ul>
-	<li>Fred Bloggs (invited by John Smith)</li>
-	<li>Jack Jackson (invited by John Smith)</li>
-	<li>Mary Black (invited by John Smith)</li>
+    <li>Fred Bloggs (invited by John Smith)</li>
+    <li>Jack Jackson (invited by John Smith)</li>
+    <li>Mary Black (invited by John Smith)</li>
 </ul>
 
 <!-- Linebreaks and indents added for clarity -->
@@ -134,26 +134,26 @@ The value of `output` is:
 
 ```js
 var template = '<p>Dear {{if isMale}}Sir{{else}}Madam{{endif}},</p>' +
-			   '{{if itemsOrdered}}'
-			   '<p>These are the items you ordered:</p>' +
-			   '<ul>' +
-					'{{foreach itemsOrdered}}<li>{{name}}</li>{{end foreach}}' +
-			   '</ul>' +
-			   '{{else}}' +
-			   '<p>You have not ordered anything recently.</p>' +
-			   '{{end if}}';
+               '{{if itemsOrdered}}'
+               '<p>These are the items you ordered:</p>' +
+               '<ul>' +
+                    '{{foreach itemsOrdered}}<li>{{name}}</li>{{end foreach}}' +
+               '</ul>' +
+               '{{else}}' +
+               '<p>You have not ordered anything recently.</p>' +
+               '{{end if}}';
 var render = DubStash.compile(template);
 
 var recipient = {
-	gender: 'f',
-	isMale: function(){
-		return recipient.gender === 'm';
-	},
-	itemsOrdered: [
-		{name: 'Grand Piano'},
-		{name: 'Violin'},
-		{name: 'Flute'}
-	]
+    gender: 'f',
+    isMale: function(){
+        return recipient.gender === 'm';
+    },
+    itemsOrdered: [
+        {name: 'Grand Piano'},
+        {name: 'Violin'},
+        {name: 'Flute'}
+    ]
 };
 
 var output = render(recipient);
@@ -164,9 +164,9 @@ The value of `output` is:
 <p>Dear Madam,</p>
 <p>These are the items you ordered:</p>
 <ul>
-	<li>Grand Piano</li>
-	<li>Violin</li>
-	<li>Flute</li>
+    <li>Grand Piano</li>
+    <li>Violin</li>
+    <li>Flute</li>
 </ul>
 
 <!-- Linebreaks and indents added for clarity -->
@@ -174,27 +174,27 @@ The value of `output` is:
 
 ### Global Templates
 
-* Different templates can make use of common building blocks known as global templates. This 
+* Different templates can make use of common building blocks known as global templates. This
   provides similar functionality to 'partials' and 'helpers' used in other templating engines.
 * Using a global template will not double-escape your HTML.
 
 ```js
 // 'bestName' is a template that writes out the best name to use for greeting a person:
-DubStash.registerGlobalTemplate('bestName', 
-	'{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
+DubStash.registerGlobalTemplate('bestName',
+    '{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
 
 // Define the text of a generic letter.
 var renderLetter = DubStash.compile('<p>Dear {{bestName}},</p>');
 
 var person1 = {
-	firstName: 'William',
-	lastName: 'Smith',
-	nickName: 'Bill'
+    firstName: 'William',
+    lastName: 'Smith',
+    nickName: 'Bill'
 };
 
 var person2 = {
-	firstName: 'Frederick',
-	lastName: 'Bloggs'	
+    firstName: 'Frederick',
+    lastName: 'Bloggs'
 };
 
 var output1 = renderLetter(person1);
@@ -214,27 +214,27 @@ The value of `output2` is:
 ### Recursion
 
 * The [global templates](#global-templates) example uses recursion: the value of the {{bestName}}
-  placeholder is itself a template that is then evaluated. 
-* If you want to treat the value of an expression as a template itself, and evaluate it, use the /r 
-  flag, e.g. ```{{blurb2 /r}}``` 
+  placeholder is itself a template that is then evaluated.
+* If you want to treat the value of an expression as a template itself, and evaluate it, use the /r
+  flag, e.g. ```{{blurb2 /r}}```
   Note: You do not need the /r flag when using  global templates -- it is implied.
 * Don't worry, recursive evaluation will not double-escape the HTML.
 
-In the [global templates](#global-templates) example, the greeting template does not handle a case 
+In the [global templates](#global-templates) example, the greeting template does not handle a case
 where we don't know a person's first name or nickname. Let's build a template that makes up for that
 deficiency.
 
 ```js
 // 'bestName' is a template that writes out the best name to use for greeting a person:
-DubStash.registerGlobalTemplate('bestName', 
-	'{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
+DubStash.registerGlobalTemplate('bestName',
+    '{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
 
 // Define the text of a generic letter. If we don't know a person's name, say 'Sir'.
 var renderLetter = DubStash.compile(
-	'<p>Dear {{if bestName}}{{bestName}}{{else}}Sir{{end if}},</p>');
+    '<p>Dear {{if bestName}}{{bestName}}{{else}}Sir{{end if}},</p>');
 
 var person3 = {
-	lastName: 'Heisenberg'
+    lastName: 'Heisenberg'
 };
 
 var output3 = renderLetter(person3);
@@ -247,9 +247,9 @@ The value of `output3` is:
 
 ## Precompilation
 
-* You can precompile templates into Javascript functions that can be inserted into your source files. 
+* You can precompile templates into Javascript functions that can be inserted into your source files.
 * Runtime startup will be faster because there will be no need for a `DubStash.compile()` step.
-* You still need to include a link to the DubStash script in your HTML, because precompiled 
+* You still need to include a link to the DubStash script in your HTML, because precompiled
   functions still depend on it.
 * Global templates that have already been registered are all compiled together as a single block.
 
@@ -259,8 +259,8 @@ The value of `output3` is:
 var DubStash = require('./dubstash.js');
 
 // 'bestName' is a template that writes out the best name to use for greeting a person:
-DubStash.registerGlobalTemplate('bestName', 
-	'{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
+DubStash.registerGlobalTemplate('bestName',
+    '{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}');
 var globalsSource = DubStash.precompileGlobalTemplates();
 
 var template = 'My name is {{bestName}}.';
@@ -274,25 +274,25 @@ output += 'var render = ' + rendererSource;
 
 The resulting output will look like this:
 ```js
-DubStash.Runtime.registerGlobalRenderer('bestName', function( ... ){ ... });
+DubStash.G('bestName', function( ... ){ ... });
 var render = function( ... ){ ... }
 ```
 
 ## Deploying
 
-Your HTML file needs to use the DubStash script. Use the distributable version 
+Your HTML file needs to use the DubStash script. Use the distributable version
 [dubstash.min.js](https://raw.github.com/isabo/DubStash/1.0.0.rc7/distributable/dubstash.min.js).
 
 ```html
 <html>
-	<head>
-		...
-		<script src="dubstash.min.js"></script>
-		...
-	</head>
-	<body>
-		...
-	</body>
+    <head>
+        ...
+        <script src="dubstash.min.js"></script>
+        ...
+    </head>
+    <body>
+        ...
+    </body>
 </html>
 ```
 
@@ -301,8 +301,10 @@ Your HTML file needs to use the DubStash script. Use the distributable version
 DubStash is compiled and minified using Google Closure Compiler. The following command line does it:
 
 ```
-java -jar /path/to/compiler.jar --js src/dubstash.js --externs src/externs.js 
-	--output_wrapper="(function(){%output%})();" --js_output_file=distributable/dubstash.min.js 
-	--compilation_level=ADVANCED_OPTIMIZATIONS --warning_level=VERBOSE --jscomp_warning=checkTypes 
-	
+npm run build
+```
+
+## Testing
+```
+npm test
 ```

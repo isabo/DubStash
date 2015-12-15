@@ -1,0 +1,234 @@
+<!DOCTYPE html><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"><meta http-equiv="Content-Language" content="en"><meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Index</title><link href="dossier.css" rel="stylesheet" type="text/css"><header><div><form><div><input type="search" placeholder="Search" tabindex="1"></div></form></div></header><main><article class="indexfile"><h1>DubStash <a href="https://codeship.com/projects/115948"> <img src="https://codeship.com/projects/da2631c0-6ea7-0133-65b3-0a1b424f46cd/status?branch&#61;master" alt="Codeship Status for isabo/DubStash" /></a></h1>
+<p>DubStash is a fast, lightweight and simple semantic template engine for HTML.</p>
+<ul><li>Use it in a client-side browser or on a back-end Node.js server.</li><li>Compile a template once, then use it repeatedly with different data.</li><li>Optionally, precompile templates to Javascript at build time for even faster loading.</li><li>Weight: &lt; 6.5 KB</li></ul>
+<h2>tl;dr</h2>
+<ul><li><code>&lt;script src&#61;&#34;dubstash.min.js&#34;&gt;&lt;/script&gt;</code> <a href="#deploying">Details...</a></li><li>{{<a href="#basic-usage">propertyName</a>}} writes out HTML-escaped value; {{{propertyName}}} writes out
+value without HTML-escaping it.</li><li>{{<strong><a href="#conditions">if</a></strong> propertyName}} <em>output this text</em> {{else}} <em>output this other
+text</em> {{end if}}</li><li>{{<strong><a href="#iterations">foreach</a></strong> collectionPropertyName}} ... {{end foreach}}</li><li><a href="#global-templates">Global templates</a> can be used by other templates as building blocks.</li><li><a href="#recursion">Recursive evaluation</a>: {{propertyName <strong>/r</strong>}} or even {{if propertyName <strong>/r</strong>}}</li><li><a href="#precompilation">Precompilation of templates to Javascript</a></li></ul>
+<h2>Usage</h2>
+<h3>Basic Usage</h3>
+<ul><li>Define a template that contains <code>{{placeholders}}</code> for values that will be substituted at runtime.</li><li>Generate a rendering function by compiling the template.</li><li>Call the rendering function with an object that contains the data to subsitute for the
+<code>{{placeholders}}</code>.</li><li>The text that replaces <code>{{placeholders}}</code> is escaped for safe use in HTML, unless you use a
+<code>{{{triple-stash}}}</code> (not shown).</li></ul>
+<pre><code>// Define the template. You normally won&#39;t do this using Javascript. Instead you can use the new
+// HTML5 &lt;template&gt; tag, or put your templates inside &lt;script type&#61;&#34;text/dubstash&#34;&gt;...&lt;/script&gt;,
+// and assign the contents to a Javascript variable using the script tag&#39;s innerHTML property.
+var template &#61; &#39;&lt;ul&gt;&lt;li&gt;My name is {{name}}.&lt;/li&gt;&#39; &#43;
+               &#39;&lt;li&gt;I live in {{address.city}}.&lt;/li&gt;&#39; &#43;
+               &#39;&lt;li&gt;My favourite cartoon is {{cartoon}}.&lt;/li&gt;&lt;/ul&gt;&#39;;
+
+// Generate a rendering function that can be used multiple times with different data.
+var render &#61; DubStash.compile(template);
+
+// Define some example data objects.
+var person1 &#61; {
+    name: &#39;John Smith&#39;,
+    address: {
+        city: &#39;Cardiff&#39;
+    },
+    cartoon: &#39;Calvin &amp; Hobbes&#39;
+};
+
+var person2 &#61; {
+    name: &#39;Fred Bloggs&#39;,
+    address: {
+        city: &#39;Swansea&#39;
+    },
+    cartoon: &#39;Tom &amp; Jerry&#39;
+};
+
+// Render the template with different data.
+var output1 &#61; render(person1);
+var output2 &#61; render(person2);
+</code></pre>
+<p>The value of <code>output1</code> is:</p>
+<pre><code>&lt;ul&gt;
+    &lt;li&gt;My name is John Smith.&lt;/li&gt;
+    &lt;li&gt;I live in Cardiff.&lt;/li&gt;
+    &lt;li&gt;My favourite cartoon is Calvin &amp;amp; Hobbes.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- Linebreaks and indents added for clarity --&gt;
+</code></pre>
+<p>The value of <code>output2</code> is:</p>
+<pre><code>&lt;ul&gt;
+    &lt;li&gt;My name is Fred Bloggs.&lt;/li&gt;
+    &lt;li&gt;I live in Swansea.&lt;/li&gt;
+    &lt;li&gt;My favourite cartoon is Tom &amp;amp; Jerry.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- Linebreaks and indents added for clarity --&gt;
+</code></pre>
+<h3>Iterations</h3>
+<ul><li>You can loop over values that are collections of objects, repeating a snippet of template for each
+one.</li><li>Inside the loop, the data object is the current member of the collection being iterated. In the
+example below <code>{{name}}</code> is used twice, but the second instance refers to a different person.
+<ul><li>Inside a loop, you can still access the parent object by prefixing the property name with <code>../</code>
+or <code>../../</code> etc.</li></ul>
+</li><li>Not only arrays can be iterated. Objects can be iterated, as well as anything that has a <code>forEach</code>
+method.</li></ul>
+<pre><code>var template &#61; &#39;&lt;p&gt;These are the people that {{name}} invited:&lt;/p&gt;&#39; &#43;
+               &#39;&lt;ul&gt;{{foreach invitees}}&lt;li&gt;{{name}} (invited by {{../../name}})&lt;/li&gt;{{end foreach}}&lt;/ul&gt;&#39;;
+var render &#61; DubStash.compile(template);
+
+var person &#61; {
+    name: &#39;John Smith&#39;,
+    invitees: [
+        {name: &#39;Fred Bloggs&#39;},
+        {name: &#39;Jack Jackson&#39;},
+        {name: &#39;Mary Black&#39;}
+    ]
+};
+
+var output &#61; render(person);
+</code></pre>
+<p>The value of <code>output</code> is:</p>
+<pre><code>&lt;p&gt;These are the people that John Smith invited:&lt;/p&gt;
+&lt;ul&gt;
+    &lt;li&gt;Fred Bloggs (invited by John Smith)&lt;/li&gt;
+    &lt;li&gt;Jack Jackson (invited by John Smith)&lt;/li&gt;
+    &lt;li&gt;Mary Black (invited by John Smith)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- Linebreaks and indents added for clarity --&gt;
+</code></pre>
+<h3>Conditions</h3>
+<ul><li>Use <code>{{if propertyName}} ... {{else}} ... {{endif}}</code> for including text conditionally.</li><li>An empty array or object will evaluate to <code>false</code>, so you can easily test whether a collection has
+items in it.</li></ul>
+<pre><code>var template &#61; &#39;&lt;p&gt;Dear {{if isMale}}Sir{{else}}Madam{{endif}},&lt;/p&gt;&#39; &#43;
+               &#39;{{if itemsOrdered}}&#39;
+               &#39;&lt;p&gt;These are the items you ordered:&lt;/p&gt;&#39; &#43;
+               &#39;&lt;ul&gt;&#39; &#43;
+                    &#39;{{foreach itemsOrdered}}&lt;li&gt;{{name}}&lt;/li&gt;{{end foreach}}&#39; &#43;
+               &#39;&lt;/ul&gt;&#39; &#43;
+               &#39;{{else}}&#39; &#43;
+               &#39;&lt;p&gt;You have not ordered anything recently.&lt;/p&gt;&#39; &#43;
+               &#39;{{end if}}&#39;;
+var render &#61; DubStash.compile(template);
+
+var recipient &#61; {
+    gender: &#39;f&#39;,
+    isMale: function(){
+        return recipient.gender &#61;&#61;&#61; &#39;m&#39;;
+    },
+    itemsOrdered: [
+        {name: &#39;Grand Piano&#39;},
+        {name: &#39;Violin&#39;},
+        {name: &#39;Flute&#39;}
+    ]
+};
+
+var output &#61; render(recipient);
+</code></pre>
+<p>The value of <code>output</code> is:</p>
+<pre><code>&lt;p&gt;Dear Madam,&lt;/p&gt;
+&lt;p&gt;These are the items you ordered:&lt;/p&gt;
+&lt;ul&gt;
+    &lt;li&gt;Grand Piano&lt;/li&gt;
+    &lt;li&gt;Violin&lt;/li&gt;
+    &lt;li&gt;Flute&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- Linebreaks and indents added for clarity --&gt;
+</code></pre>
+<h3>Global Templates</h3>
+<ul><li>Different templates can make use of common building blocks known as global templates. This
+provides similar functionality to &#39;partials&#39; and &#39;helpers&#39; used in other templating engines.</li><li>Using a global template will not double-escape your HTML.</li></ul>
+<pre><code>// &#39;bestName&#39; is a template that writes out the best name to use for greeting a person:
+DubStash.registerGlobalTemplate(&#39;bestName&#39;,
+    &#39;{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}&#39;);
+
+// Define the text of a generic letter.
+var renderLetter &#61; DubStash.compile(&#39;&lt;p&gt;Dear {{bestName}},&lt;/p&gt;&#39;);
+
+var person1 &#61; {
+    firstName: &#39;William&#39;,
+    lastName: &#39;Smith&#39;,
+    nickName: &#39;Bill&#39;
+};
+
+var person2 &#61; {
+    firstName: &#39;Frederick&#39;,
+    lastName: &#39;Bloggs&#39;
+};
+
+var output1 &#61; renderLetter(person1);
+var output2 &#61; renderLetter(person2);
+</code></pre>
+<p>The value of <code>output1</code> is:</p>
+<pre><code>&lt;p&gt;Dear Bill,&lt;/p&gt;
+</code></pre>
+<p>The value of <code>output2</code> is:</p>
+<pre><code>&lt;p&gt;Dear Frederick,&lt;/p&gt;
+</code></pre>
+<h3>Recursion</h3>
+<ul><li>The <a href="#global-templates">global templates</a> example uses recursion: the value of the {{bestName}}
+placeholder is itself a template that is then evaluated.</li><li>If you want to treat the value of an expression as a template itself, and evaluate it, use the /r
+flag, e.g. <code>{{blurb2 /r}}</code>
+Note: You do not need the /r flag when using  global templates -- it is implied.</li><li>Don&#39;t worry, recursive evaluation will not double-escape the HTML.</li></ul>
+<p>In the <a href="#global-templates">global templates</a> example, the greeting template does not handle a case
+where we don&#39;t know a person&#39;s first name or nickname. Let&#39;s build a template that makes up for that
+deficiency.</p>
+<pre><code>// &#39;bestName&#39; is a template that writes out the best name to use for greeting a person:
+DubStash.registerGlobalTemplate(&#39;bestName&#39;,
+    &#39;{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}&#39;);
+
+// Define the text of a generic letter. If we don&#39;t know a person&#39;s name, say &#39;Sir&#39;.
+var renderLetter &#61; DubStash.compile(
+    &#39;&lt;p&gt;Dear {{if bestName}}{{bestName}}{{else}}Sir{{end if}},&lt;/p&gt;&#39;);
+
+var person3 &#61; {
+    lastName: &#39;Heisenberg&#39;
+};
+
+var output3 &#61; renderLetter(person3);
+</code></pre>
+<p>The value of <code>output3</code> is:</p>
+<pre><code>&lt;p&gt;Dear Sir,&lt;/p&gt;
+</code></pre>
+<h2>Precompilation</h2>
+<ul><li>You can precompile templates into Javascript functions that can be inserted into your source files.</li><li>Runtime startup will be faster because there will be no need for a <code>DubStash.compile()</code> step.</li><li>You still need to include a link to the DubStash script in your HTML, because precompiled
+functions still depend on it.</li><li>Global templates that have already been registered are all compiled together as a single block.</li></ul>
+<pre><code>// Typically you would do this in Node, where you can save the precompiled functions without having
+// to manually copy/paste them into a .js source file.
+var DubStash &#61; require(&#39;./dubstash.js&#39;);
+
+// &#39;bestName&#39; is a template that writes out the best name to use for greeting a person:
+DubStash.registerGlobalTemplate(&#39;bestName&#39;,
+    &#39;{{if nickName}}{{nickName}}{{else}}{{firstName}}{{end if}}&#39;);
+var globalsSource &#61; DubStash.precompileGlobalTemplates();
+
+var template &#61; &#39;My name is {{bestName}}.&#39;;
+var rendererSource &#61; DubStash.precompile(template);
+
+// Build the output which should be saved as a JS file.
+var output &#61; globalsSource &#43; &#39;\n&#39;;
+output &#43;&#61; &#39;var render &#61; &#39; &#43; rendererSource;
+...
+</code></pre>
+<p>The resulting output will look like this:</p>
+<pre><code>DubStash.G(&#39;bestName&#39;, function( ... ){ ... });
+var render &#61; function( ... ){ ... }
+</code></pre>
+<h2>Deploying</h2>
+<p>Your HTML file needs to use the DubStash script. Use the distributable version
+<a href="https://raw.github.com/isabo/DubStash/1.0.0.rc7/distributable/dubstash.min.js">dubstash.min.js</a>.</p>
+<pre><code>&lt;html&gt;
+    &lt;head&gt;
+        ...
+        &lt;script src&#61;&#34;dubstash.min.js&#34;&gt;&lt;/script&gt;
+        ...
+    &lt;/head&gt;
+    &lt;body&gt;
+        ...
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<h2>Building</h2>
+<p>DubStash is compiled and minified using Google Closure Compiler. The following command line does it:</p>
+<pre><code>npm run build
+</code></pre>
+<h2>Testing</h2>
+<pre><code>npm test
+</code></pre>
+</article><nav><h3><a href="index.html" tabindex="2">Overview</a></h3><div><input type="checkbox" id="nav-types" checked/><label for="nav-types"><h3><span class="selectable" tabindex="2">Types</span></h3></label><div id="nav-types-view"></div></div></nav></main><footer><div><a href="https://github.com/jleyba/js-dossier">Generated by dossier</a></div></footer><script src="types.js"></script><script src="dossier.js"></script>

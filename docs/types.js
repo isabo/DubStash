@@ -1,0 +1,1 @@
+var TYPES = {"types":[{"name":"DubStash","href":"namespace_DubStash.html","namespace":true,"interface":false,"statics":["VERSION","compile","createContext","precompile","precompileGlobalTemplates","registerGlobalData","registerGlobalTemplate"]}]};

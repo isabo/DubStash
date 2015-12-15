@@ -1,0 +1,35 @@
+{
+  "name": "dubstash",
+  "version": "1.0.0",
+  "description": "Fast, lightweight semantic template engine for HTML.",
+  "main": "distributable/dubstash.min.js",
+  "scripts": {
+    "test": "node_modules/.bin/tape test/**test.js | node_modules/.bin/faucet",
+    "build": "node build/build.js",
+    "compile": "node build/compile.js",
+    "docs": "node build/generate-docs.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/isabo/DubStash.git"
+  },
+  "keywords": [
+    "template",
+    "semantic",
+    "html"
+  ],
+  "author": "Itzy Sabo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/isabo/DubStash/issues"
+  },
+  "homepage": "https://github.com/isabo/DubStash#README",
+  "devDependencies": {
+    "closure-compiler": "git://github.com/isabo/node-closure.git#allow-newer-compiler",
+    "faucet": "0.0.1",
+    "google-closure-compiler": "^20151015.0.0",
+    "google-closure-library": "^20151015.0.0",
+    "js-dossier": "isabo/js-dossier-npm",
+    "tape": "^4.2.1"
+  }
+}
